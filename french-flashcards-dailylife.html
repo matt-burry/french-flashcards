@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Quotidien">
+<meta name="theme-color" content="#f8fafc">
+<title>La Vie Quotidienne — French Flash Cards</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJzZXJpZiI+RnI8L3RleHQ+PC9zdmc+">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useEffect } = React;
+
+const CARDS = [
+  { fr: "se r\u00e9veiller", en: "to wake up", ex: "Je me r\u00e9veille \u00e0 sept heures chaque matin.", exEn: "I wake up at seven o'clock every morning.", cat: "Morning Routine" },
+  { fr: "se lever", en: "to get up", ex: "Elle se l\u00e8ve d\u00e8s que le r\u00e9veil sonne.", exEn: "She gets up as soon as the alarm rings.", cat: "Morning Routine" },
+  { fr: "se brosser les dents", en: "to brush one's teeth", ex: "Les enfants se brossent les dents apr\u00e8s le petit d\u00e9jeuner.", exEn: "The children brush their teeth after breakfast.", cat: "Morning Routine" },
+  { fr: "se doucher", en: "to shower", ex: "Il se douche rapidement avant de partir.", exEn: "He showers quickly before leaving.", cat: "Morning Routine" },
+  { fr: "s'habiller", en: "to get dressed", ex: "Je m'habille chaudement en hiver.", exEn: "I dress warmly in winter.", cat: "Morning Routine" },
+  { fr: "prendre le petit d\u00e9jeuner", en: "to have breakfast", ex: "Nous prenons le petit d\u00e9jeuner ensemble le dimanche.", exEn: "We have breakfast together on Sundays.", cat: "Morning Routine" },
+  { fr: "se pr\u00e9parer", en: "to get ready", ex: "Elle se pr\u00e9pare en vingt minutes.", exEn: "She gets ready in twenty minutes.", cat: "Morning Routine" },
+  { fr: "se d\u00e9p\u00eacher", en: "to hurry", ex: "D\u00e9p\u00eache-toi, on va \u00eatre en retard !", exEn: "Hurry up, we're going to be late!", cat: "Morning Routine" },
+
+  { fr: "cuisiner", en: "to cook", ex: "J'aime cuisiner des plats simples le soir.", exEn: "I like to cook simple dishes in the evening.", cat: "Meals" },
+  { fr: "d\u00e9jeuner", en: "to have lunch", ex: "On d\u00e9jeune \u00e0 midi \u00e0 la cantine.", exEn: "We have lunch at noon in the cafeteria.", cat: "Meals" },
+  { fr: "d\u00eener", en: "to have dinner", ex: "Ce soir, on d\u00eene chez mes parents.", exEn: "Tonight, we're having dinner at my parents' place.", cat: "Meals" },
+  { fr: "mettre la table", en: "to set the table", ex: "Tu peux mettre la table, s'il te pla\u00eet ?", exEn: "Can you set the table, please?", cat: "Meals" },
+  { fr: "d\u00e9barrasser la table", en: "to clear the table", ex: "Les enfants d\u00e9barrassent la table apr\u00e8s le repas.", exEn: "The children clear the table after the meal.", cat: "Meals" },
+  { fr: "faire la vaisselle", en: "to do the dishes", ex: "C'est \u00e0 ton tour de faire la vaisselle.", exEn: "It's your turn to do the dishes.", cat: "Meals" },
+  { fr: "un repas", en: "a meal", ex: "Ce repas \u00e9tait d\u00e9licieux, merci !", exEn: "This meal was delicious, thank you!", cat: "Meals" },
+  { fr: "une recette", en: "a recipe", ex: "J'ai trouv\u00e9 une bonne recette sur internet.", exEn: "I found a good recipe on the internet.", cat: "Meals" },
+
+  { fr: "faire le m\u00e9nage", en: "to do housework", ex: "Je fais le m\u00e9nage le samedi matin.", exEn: "I do the housework on Saturday morning.", cat: "Household" },
+  { fr: "passer l'aspirateur", en: "to vacuum", ex: "Il faut passer l'aspirateur dans le salon.", exEn: "We need to vacuum the living room.", cat: "Household" },
+  { fr: "faire la lessive", en: "to do laundry", ex: "Je fais la lessive deux fois par semaine.", exEn: "I do the laundry twice a week.", cat: "Household" },
+  { fr: "repasser", en: "to iron", ex: "Je d\u00e9teste repasser les chemises.", exEn: "I hate ironing shirts.", cat: "Household" },
+  { fr: "ranger", en: "to tidy up", ex: "Range ta chambre avant de sortir.", exEn: "Tidy up your room before going out.", cat: "Household" },
+  { fr: "nettoyer", en: "to clean", ex: "Il faut nettoyer la salle de bains.", exEn: "We need to clean the bathroom.", cat: "Household" },
+  { fr: "sortir les poubelles", en: "to take out the trash", ex: "N'oublie pas de sortir les poubelles ce soir.", exEn: "Don't forget to take out the trash tonight.", cat: "Household" },
+  { fr: "arroser les plantes", en: "to water the plants", ex: "Tu peux arroser les plantes pendant mon absence ?", exEn: "Can you water the plants while I'm away?", cat: "Household" },
+  { fr: "bricoler", en: "to do DIY / tinker", ex: "Mon p\u00e8re adore bricoler le week-end.", exEn: "My father loves to do DIY on weekends.", cat: "Household" },
+
+  { fr: "faire les courses", en: "to go grocery shopping", ex: "On fait les courses au supermarch\u00e9 le vendredi.", exEn: "We go grocery shopping at the supermarket on Fridays.", cat: "Shopping" },
+  { fr: "une liste de courses", en: "a shopping list", ex: "J'ai oubli\u00e9 ma liste de courses \u00e0 la maison.", exEn: "I forgot my shopping list at home.", cat: "Shopping" },
+  { fr: "le march\u00e9", en: "the market", ex: "Le march\u00e9 est ouvert le mercredi et le samedi.", exEn: "The market is open on Wednesdays and Saturdays.", cat: "Shopping" },
+  { fr: "un caddie", en: "a shopping cart", ex: "Prends un caddie, on a beaucoup de choses \u00e0 acheter.", exEn: "Get a cart, we have a lot of things to buy.", cat: "Shopping" },
+  { fr: "la caisse", en: "the checkout", ex: "Il y a la queue \u00e0 la caisse.", exEn: "There's a line at the checkout.", cat: "Shopping" },
+  { fr: "un sac", en: "a bag", ex: "Vous avez un sac, s'il vous pla\u00eet ?", exEn: "Do you have a bag, please?", cat: "Shopping" },
+  { fr: "payer", en: "to pay", ex: "Je peux payer par carte ?", exEn: "Can I pay by card?", cat: "Shopping" },
+  { fr: "la boulangerie", en: "the bakery", ex: "Je passe \u00e0 la boulangerie chercher du pain.", exEn: "I'm stopping by the bakery to get bread.", cat: "Shopping" },
+  { fr: "la pharmacie", en: "the pharmacy", ex: "Il faut aller \u00e0 la pharmacie pour tes m\u00e9dicaments.", exEn: "We need to go to the pharmacy for your medicine.", cat: "Shopping" },
+
+  { fr: "prendre le bus", en: "to take the bus", ex: "Je prends le bus pour aller au travail.", exEn: "I take the bus to go to work.", cat: "Transport" },
+  { fr: "le m\u00e9tro", en: "the subway", ex: "Le m\u00e9tro est plus rapide aux heures de pointe.", exEn: "The subway is faster during rush hour.", cat: "Transport" },
+  { fr: "conduire", en: "to drive", ex: "Elle conduit prudemment quand il pleut.", exEn: "She drives carefully when it rains.", cat: "Transport" },
+  { fr: "se garer", en: "to park", ex: "C'est difficile de se garer en centre-ville.", exEn: "It's hard to find parking downtown.", cat: "Transport" },
+  { fr: "un embouteillage", en: "a traffic jam", ex: "Il y a un embouteillage sur l'autoroute.", exEn: "There's a traffic jam on the highway.", cat: "Transport" },
+  { fr: "un trajet", en: "a commute / trip", ex: "Mon trajet dure quarante-cinq minutes.", exEn: "My commute takes forty-five minutes.", cat: "Transport" },
+  { fr: "un arr\u00eat de bus", en: "a bus stop", ex: "L'arr\u00eat de bus est au coin de la rue.", exEn: "The bus stop is on the street corner.", cat: "Transport" },
+  { fr: "faire le plein", en: "to fill up (gas)", ex: "Il faut faire le plein avant le voyage.", exEn: "We need to fill up before the trip.", cat: "Transport" },
+
+  { fr: "travailler", en: "to work", ex: "Je travaille de neuf heures \u00e0 dix-huit heures.", exEn: "I work from nine to six.", cat: "Work & Activities" },
+  { fr: "une r\u00e9union", en: "a meeting", ex: "J'ai une r\u00e9union \u00e0 quatorze heures.", exEn: "I have a meeting at two o'clock.", cat: "Work & Activities" },
+  { fr: "un rendez-vous", en: "an appointment", ex: "J'ai un rendez-vous chez le m\u00e9decin demain.", exEn: "I have a doctor's appointment tomorrow.", cat: "Work & Activities" },
+  { fr: "se d\u00e9tendre", en: "to relax", ex: "Le soir, j'aime me d\u00e9tendre avec un bon livre.", exEn: "In the evening, I like to relax with a good book.", cat: "Work & Activities" },
+  { fr: "se promener", en: "to go for a walk", ex: "On se prom\u00e8ne dans le parc apr\u00e8s d\u00eener.", exEn: "We go for a walk in the park after dinner.", cat: "Work & Activities" },
+  { fr: "faire du sport", en: "to exercise", ex: "Elle fait du sport trois fois par semaine.", exEn: "She exercises three times a week.", cat: "Work & Activities" },
+
+  { fr: "se coucher", en: "to go to bed", ex: "Les enfants se couchent \u00e0 vingt et une heures.", exEn: "The children go to bed at nine o'clock.", cat: "Evening" },
+  { fr: "s'endormir", en: "to fall asleep", ex: "Il s'endort toujours devant la t\u00e9l\u00e9.", exEn: "He always falls asleep in front of the TV.", cat: "Evening" },
+  { fr: "fermer \u00e0 cl\u00e9", en: "to lock up", ex: "N'oublie pas de fermer \u00e0 cl\u00e9 avant de dormir.", exEn: "Don't forget to lock up before going to sleep.", cat: "Evening" },
+  { fr: "\u00e9teindre la lumi\u00e8re", en: "to turn off the light", ex: "\u00c9teins la lumi\u00e8re, s'il te pla\u00eet.", exEn: "Turn off the light, please.", cat: "Evening" },
+
+  { fr: "tous les jours", en: "every day", ex: "Je bois du caf\u00e9 tous les jours.", exEn: "I drink coffee every day.", cat: "Useful Phrases" },
+  { fr: "d'habitude", en: "usually", ex: "D'habitude, je rentre \u00e0 la maison vers six heures.", exEn: "Usually, I come home around six o'clock.", cat: "Useful Phrases" },
+  { fr: "en avance", en: "early / ahead of time", ex: "Elle arrive toujours en avance.", exEn: "She always arrives early.", cat: "Useful Phrases" },
+  { fr: "en retard", en: "late", ex: "Excusez-moi, je suis en retard.", exEn: "Excuse me, I'm late.", cat: "Useful Phrases" },
+  { fr: "avoir besoin de", en: "to need", ex: "J'ai besoin de faire des courses.", exEn: "I need to go shopping.", cat: "Useful Phrases" },
+  { fr: "avoir envie de", en: "to feel like / want", ex: "J'ai envie de rester \u00e0 la maison ce soir.", exEn: "I feel like staying home tonight.", cat: "Useful Phrases" },
+  { fr: "il faut", en: "it's necessary / one must", ex: "Il faut partir maintenant.", exEn: "We have to leave now.", cat: "Useful Phrases" },
+  { fr: "\u00eatre en train de", en: "to be in the middle of", ex: "Je suis en train de pr\u00e9parer le d\u00eener.", exEn: "I'm in the middle of making dinner.", cat: "Useful Phrases" },
+];
+
+const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
+
+const CAT_COLORS = {
+  "Morning Routine": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Meals": { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
+  "Household": { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
+  "Shopping": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
+  "Transport": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
+  "Work & Activities": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
+  "Evening": { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)", text: "rgb(67, 56, 202)" },
+  "Useful Phrases": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function FlashCards() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [flipped, setFlipped] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [shuffled, setShuffled] = useState(false);
+  const [known, setKnown] = useState(new Set());
+  const [hideKnown, setHideKnown] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+
+  const deck = useMemo(() => {
+    let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
+    if (hideKnown) cards = cards.filter((_, i) => {
+      const globalIdx = CARDS.indexOf(cards === CARDS ? CARDS[i] : cards[i]);
+      return !known.has(globalIdx);
+    });
+    return shuffled ? shuffle(cards) : cards;
+  }, [activeCat, shuffled, hideKnown, known]);
+
+  const safeIndex = Math.min(index, Math.max(0, deck.length - 1));
+  const card = deck[safeIndex];
+  const globalIdx = card ? CARDS.indexOf(card) : -1;
+
+  const next = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
+  const prev = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.max(i - 1, 0)); }, []);
+  const toggleKnown = useCallback(() => {
+    if (globalIdx < 0) return;
+    setKnown(prev => {
+      const s = new Set(prev);
+      s.has(globalIdx) ? s.delete(globalIdx) : s.add(globalIdx);
+      return s;
+    });
+  }, [globalIdx]);
+
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Morning Routine"];
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === " ") { e.preventDefault(); setFlipped(f => !f); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  // Swipe support for mobile
+  const [touchStart, setTouchStart] = useState(null);
+  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 50) { diff > 0 ? prev() : next(); }
+    setTouchStart(null);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
+            La Vie Quotidienne
+          </h1>
+          <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
+            {CARDS.length} words &amp; phrases for daily life in French
+          </p>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+          <button
+            onClick={() => { setActiveCat("All"); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+            style={{
+              padding: "5px 12px", borderRadius: 20, border: "2px solid",
+              borderColor: activeCat === "All" ? "#475569" : "#cbd5e1",
+              background: activeCat === "All" ? "#475569" : "white",
+              color: activeCat === "All" ? "white" : "#475569",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >All ({CARDS.length})</button>
+          {CATEGORIES.map(cat => {
+            const c = CAT_COLORS[cat];
+            const count = CARDS.filter(x => x.cat === cat).length;
+            return (
+              <button key={cat}
+                onClick={() => { setActiveCat(cat); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "2px solid",
+                  borderColor: activeCat === cat ? c.border : "#cbd5e1",
+                  background: activeCat === cat ? c.bg : "white",
+                  color: activeCat === cat ? c.text : "#64748b",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+                }}
+              >{cat} ({count})</button>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={shuffled} onChange={() => { setShuffled(!shuffled); setIndex(0); setFlipped(false); }} />
+            Shuffle
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={hideKnown} onChange={() => { setHideKnown(!hideKnown); setIndex(0); setFlipped(false); }} />
+            Hide known ({known.size})
+          </label>
+          {known.size > 0 && (
+            <button onClick={() => setKnown(new Set())}
+              style={{ fontSize: 12, color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+              Reset
+            </button>
+          )}
+        </div>
+
+        {deck.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 60, color: "#64748b" }}>
+            <p style={{ fontSize: 18 }}>You know all the cards in this category!</p>
+            <button onClick={() => { setHideKnown(false); }}
+              style={{ marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none", background: "#475569", color: "white", cursor: "pointer" }}>
+              Show all cards
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${((safeIndex + 1) / deck.length) * 100}%`, background: colors.border, borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: 10, fontSize: 14, color: "#64748b" }}>
+              {safeIndex + 1} / {deck.length}
+              {card && <span style={{ marginLeft: 10, padding: "2px 8px", borderRadius: 12, background: colors.bg, color: colors.text, fontSize: 11, fontWeight: 600 }}>{card.cat}</span>}
+            </div>
+
+            <div
+              onClick={() => setFlipped(!flipped)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              style={{
+                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 320,
+                userSelect: "none", WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <div style={{
+                position: "relative", width: "100%", height: "100%",
+                transformStyle: "preserve-3d", transition: "transform 0.5s",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              }}>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: "#1e293b", textAlign: "center", lineHeight: 1.3 }}>
+                    {card?.fr}
+                  </div>
+                  <div style={{ marginTop: 14, fontSize: 13, color: "#94a3b8" }}>
+                    Tap to reveal
+                  </div>
+                </div>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  background: `linear-gradient(145deg, ${colors.bg}, white)`,
+                  borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                  overflow: "auto",
+                }}>
+                  <div style={{ fontSize: 26, fontWeight: 700, color: colors.text, textAlign: "center" }}>
+                    {card?.en}
+                  </div>
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setShowTranslation(s => !s); }}
+                    style={{
+                      marginTop: 20, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
+                      borderRadius: 10, borderLeft: `4px solid ${colors.border}`, width: "100%", maxWidth: 400,
+                      cursor: "pointer", position: "relative", transition: "background 0.2s",
+                    }}
+                  >
+                    <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic", lineHeight: 1.5 }}>
+                      {card?.ex}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 5, textAlign: "center" }}>
+                      {showTranslation ? "Tap to hide translation" : "Tap for English translation"}
+                    </div>
+                    {showTranslation && (
+                      <div style={{
+                        marginTop: 8, padding: "8px 12px",
+                        background: "white", borderRadius: 8,
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                        fontSize: 14, color: "#475569", lineHeight: 1.5,
+                      }}>
+                        {card?.exEn}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+              <button onClick={prev} disabled={safeIndex === 0}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === 0 ? "#f1f5f9" : "white", color: safeIndex === 0 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === 0 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2190"}</button>
+
+              <button onClick={toggleKnown}
+                style={{
+                  padding: "10px 20px", borderRadius: 10,
+                  border: `2px solid ${known.has(globalIdx) ? "#22c55e" : "#cbd5e1"}`,
+                  background: known.has(globalIdx) ? "#dcfce7" : "white",
+                  color: known.has(globalIdx) ? "#15803d" : "#64748b",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                }}>
+                {known.has(globalIdx) ? "Known" : "Mark as known"}
+              </button>
+
+              <button onClick={next} disabled={safeIndex >= deck.length - 1}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex >= deck.length - 1 ? "#f1f5f9" : "white",
+                  color: safeIndex >= deck.length - 1 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex >= deck.length - 1 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2192"}</button>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: "#94a3b8" }}>
+              Swipe or use arrow keys to navigate, tap card or spacebar to flip
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FlashCards />);
+</script>
+</body>
+</html>
