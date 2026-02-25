@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Les Courses">
+<meta name="theme-color" content="#f8fafc">
+<title>Les Courses et la Cuisine — French Flash Cards</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJzZXJpZiI+RnI8L3RleHQ+PC9zdmc+">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useEffect } = React;
+
+const CARDS = [
+  { fr: "une pomme", en: "an apple", ex: "Je mange une pomme verte chaque jour.", exEn: "I eat a green apple every day.", cat: "Fruits & Vegetables" },
+  { fr: "une banane", en: "a banana", ex: "Les bananes sont riches en potassium.", exEn: "Bananas are rich in potassium.", cat: "Fruits & Vegetables" },
+  { fr: "une orange", en: "an orange", ex: "Je pr\u00e9f\u00e8re les oranges sucr\u00e9es.", exEn: "I prefer sweet oranges.", cat: "Fruits & Vegetables" },
+  { fr: "une carotte", en: "a carrot", ex: "Ajoute des carottes dans la soupe.", exEn: "Add carrots to the soup.", cat: "Fruits & Vegetables" },
+  { fr: "un oignon", en: "an onion", ex: "Les oignons font pleurer quand on les coupe.", exEn: "Onions make you cry when you cut them.", cat: "Fruits & Vegetables" },
+  { fr: "l'ail (m)", en: "garlic", ex: "Je mets toujours de l'ail dans mes plats.", exEn: "I always put garlic in my dishes.", cat: "Fruits & Vegetables" },
+  { fr: "une tomate", en: "a tomato", ex: "Les tomates du march\u00e9 sont excellentes.", exEn: "The tomatoes from the market are excellent.", cat: "Fruits & Vegetables" },
+  { fr: "une laitue", en: "lettuce", ex: "La laitue verte est cr\u00e9meuse.", exEn: "Green lettuce is creamy.", cat: "Fruits & Vegetables" },
+  { fr: "une pomme de terre", en: "a potato", ex: "Je pr\u00e9f\u00e8re les pommes de terre r\u00f4ties.", exEn: "I prefer roasted potatoes.", cat: "Fruits & Vegetables" },
+  { fr: "des \u00e9pinards", en: "spinach", ex: "Les \u00e9pinards sont tr\u00e8s bons pour la sant\u00e9.", exEn: "Spinach is very good for your health.", cat: "Fruits & Vegetables" },
+
+  { fr: "le poulet", en: "chicken", ex: "Je fais cuire le poulet au four.", exEn: "I roast the chicken in the oven.", cat: "Meat & Seafood" },
+  { fr: "le b\u0153uf", en: "beef", ex: "Ce r\u00f4ti de b\u0153uf est d\u00e9licieux.", exEn: "This beef roast is delicious.", cat: "Meat & Seafood" },
+  { fr: "le porc", en: "pork", ex: "Les c\u00f4telettes de porc sont tendres.", exEn: "Pork chops are tender.", cat: "Meat & Seafood" },
+  { fr: "le poisson", en: "fish", ex: "Je cuisine du poisson deux fois par semaine.", exEn: "I cook fish twice a week.", cat: "Meat & Seafood" },
+  { fr: "les crevettes (f)", en: "shrimp", ex: "Les crevettes sont excellentes avec de l'ail.", exEn: "Shrimp is excellent with garlic.", cat: "Meat & Seafood" },
+  { fr: "le saumon", en: "salmon", ex: "Le saumon grill\u00e9 est savoureux.", exEn: "Grilled salmon is delicious.", cat: "Meat & Seafood" },
+  { fr: "les mo\u00fcles (f)", en: "mussels", ex: "Les mo\u00fcles \u00e0 la cr\u00e8me sont un d\u00e9lice.", exEn: "Creamy mussels are a delight.", cat: "Meat & Seafood" },
+  { fr: "le jambon", en: "ham", ex: "Je prends du jambon pour le sandwich.", exEn: "I take ham for the sandwich.", cat: "Meat & Seafood" },
+
+  { fr: "le lait", en: "milk", ex: "Je bois un verre de lait le matin.", exEn: "I drink a glass of milk in the morning.", cat: "Dairy & Bakery" },
+  { fr: "le fromage", en: "cheese", ex: "La France produit d'excellents fromages.", exEn: "France produces excellent cheeses.", cat: "Dairy & Bakery" },
+  { fr: "le beurre", en: "butter", ex: "Ajoute du beurre dans la po\u00eal\u00e9.", exEn: "Add butter to the pan.", cat: "Dairy & Bakery" },
+  { fr: "les \u0153ufs (m)", en: "eggs", ex: "Je pr\u00e9pare des \u0153ufs brouill\u00e9s.", exEn: "I prepare scrambled eggs.", cat: "Dairy & Bakery" },
+  { fr: "la cr\u00e8me fra\u00eeche", en: "sour cream", ex: "La cr\u00e8me fra\u00eeche rend les sauces cr\u00e9meuses.", exEn: "Sour cream makes sauces creamy.", cat: "Dairy & Bakery" },
+  { fr: "le yaourt", en: "yogurt", ex: "Je mange du yaourt grec au petit d\u00e9jeuner.", exEn: "I eat Greek yogurt for breakfast.", cat: "Dairy & Bakery" },
+  { fr: "la baguette", en: "a baguette", ex: "J'ach\u00e8te une baguette fra\u00eeche chaque jour.", exEn: "I buy a fresh baguette every day.", cat: "Dairy & Bakery" },
+  { fr: "un croissant", en: "a croissant", ex: "Les croissants sont croustillants le matin.", exEn: "Croissants are crispy in the morning.", cat: "Dairy & Bakery" },
+  { fr: "le pain complet", en: "wholemeal bread", ex: "Le pain complet est plus nutritif.", exEn: "Wholemeal bread is more nutritious.", cat: "Dairy & Bakery" },
+
+  { fr: "la farine", en: "flour", ex: "J'ai besoin de farine pour les cr\u00eapes.", exEn: "I need flour for crepes.", cat: "Pantry Staples" },
+  { fr: "le sucre", en: "sugar", ex: "Je mets du sucre dans mon caf\u00e9.", exEn: "I put sugar in my coffee.", cat: "Pantry Staples" },
+  { fr: "l'huile (f)", en: "oil", ex: "L'huile d'olive est bonne pour la sant\u00e9.", exEn: "Olive oil is good for your health.", cat: "Pantry Staples" },
+  { fr: "le sel", en: "salt", ex: "N'oublie pas le sel dans l'eau de cuisson.", exEn: "Don't forget the salt in the cooking water.", cat: "Pantry Staples" },
+  { fr: "le poivre", en: "pepper", ex: "Assaisonne avec du sel et du poivre.", exEn: "Season with salt and pepper.", cat: "Pantry Staples" },
+  { fr: "le riz", en: "rice", ex: "Je pr\u00e9f\u00e8re le riz blanc.", exEn: "I prefer white rice.", cat: "Pantry Staples" },
+  { fr: "les p\u00e2tes (f)", en: "pasta", ex: "Les p\u00e2tes \u00e0 la carbonara sont italienne.", exEn: "Pasta carbonara is Italian.", cat: "Pantry Staples" },
+  { fr: "le vinaigre", en: "vinegar", ex: "Ajoute un peu de vinaigre pour le go\u00fbt.", exEn: "Add a little vinegar for taste.", cat: "Pantry Staples" },
+  { fr: "la moutarde", en: "mustard", ex: "Je mets de la moutarde sur mon sandwich.", exEn: "I put mustard on my sandwich.", cat: "Pantry Staples" },
+  { fr: "le miel", en: "honey", ex: "Le miel rend le th\u00e9 plus doux.", exEn: "Honey makes tea sweeter.", cat: "Pantry Staples" },
+
+  { fr: "le rayon", en: "the aisle / shelf", ex: "Le rayon des fruits est au fond du magasin.", exEn: "The fruit aisle is at the back of the store.", cat: "At the Store" },
+  { fr: "le prix", en: "the price", ex: "Quel est le prix de ce fromage ?", exEn: "What is the price of this cheese?", cat: "At the Store" },
+  { fr: "une promotion", en: "a sale / promotion", ex: "Il y a une promotion sur les yaourts.", exEn: "There's a sale on yogurts.", cat: "At the Store" },
+  { fr: "peser", en: "to weigh", ex: "Je dois peser les pommes.", exEn: "I need to weigh the apples.", cat: "At the Store" },
+  { fr: "un chariot", en: "a shopping cart", ex: "Prends un chariot, on achète beaucoup.", exEn: "Get a cart, we're buying a lot.", cat: "At the Store" },
+  { fr: "une liste de courses", en: "a shopping list", ex: "J'ai \u00e9crit une liste avant d'aller au supermarch\u00e9.", exEn: "I wrote a list before going to the supermarket.", cat: "At the Store" },
+  { fr: "la caisse", en: "the checkout", ex: "Il y a une queue \u00e0 la caisse.", exEn: "There's a line at the checkout.", cat: "At the Store" },
+  { fr: "payer", en: "to pay", ex: "Tu peux payer par carte de cr\u00e9dit.", exEn: "You can pay by credit card.", cat: "At the Store" },
+
+  { fr: "une casserole", en: "a pot / saucepan", ex: "Je fais bouillir l'eau dans une casserole.", exEn: "I boil water in a pot.", cat: "Kitchen Tools" },
+  { fr: "une po\u00eal\u00e9", en: "a frying pan", ex: "Fais sauter les l\u00e9gumes dans la po\u00eal\u00e9.", exEn: "Saute the vegetables in the frying pan.", cat: "Kitchen Tools" },
+  { fr: "un couteau", en: "a knife", ex: "Je dois a\u00e9guiser mon couteau.", exEn: "I need to sharpen my knife.", cat: "Kitchen Tools" },
+  { fr: "une planche \u00e0 d\u00e9couper", en: "a cutting board", ex: "Coupe les l\u00e9gumes sur la planche.", exEn: "Cut the vegetables on the cutting board.", cat: "Kitchen Tools" },
+  { fr: "un four", en: "an oven", ex: "Mets le poulet au four \u00e0 200 degr\u00e9s.", exEn: "Put the chicken in the oven at 200 degrees.", cat: "Kitchen Tools" },
+  { fr: "une cuiller", en: "a spoon", ex: "Utilise une cuiller en bois pour m\u00e9langer.", exEn: "Use a wooden spoon to mix.", cat: "Kitchen Tools" },
+  { fr: "une fourchette", en: "a fork", ex: "Pique la viande avec une fourchette.", exEn: "Pierce the meat with a fork.", cat: "Kitchen Tools" },
+  { fr: "un \u00e9plucheur", en: "a peeler", ex: "Utilise l'\u00e9plucheur pour les pommes de terre.", exEn: "Use the peeler for potatoes.", cat: "Kitchen Tools" },
+
+  { fr: "couper", en: "to cut", ex: "Coupe les oignons finement.", exEn: "Cut the onions finely.", cat: "Cooking Verbs" },
+  { fr: "m\u00e9langer", en: "to mix", ex: "M\u00e9lange les ingr\u00e9dients dans un bol.", exEn: "Mix the ingredients in a bowl.", cat: "Cooking Verbs" },
+  { fr: "faire bouillir", en: "to boil", ex: "Fais bouillir l'eau pour les p\u00e2tes.", exEn: "Boil the water for pasta.", cat: "Cooking Verbs" },
+  { fr: "\u00e9plucher", en: "to peel", ex: "\u00c9pluche les carottes avant de les cuire.", exEn: "Peel the carrots before cooking them.", cat: "Cooking Verbs" },
+  { fr: "assaisonner", en: "to season", ex: "Assaisonne le plat avec du sel et du poivre.", exEn: "Season the dish with salt and pepper.", cat: "Cooking Verbs" },
+  { fr: "faire sauter", en: "to saute", ex: "Fais sauter les champignons dans le beurre.", exEn: "Saute the mushrooms in butter.", cat: "Cooking Verbs" },
+  { fr: "faire cuire", en: "to cook", ex: "Fais cuire le poulet pendant 45 minutes.", exEn: "Cook the chicken for 45 minutes.", cat: "Cooking Verbs" },
+  { fr: "r\u00f4tir", en: "to roast", ex: "R\u00f4tis les l\u00e9gumes au four.", exEn: "Roast the vegetables in the oven.", cat: "Cooking Verbs" },
+  { fr: "mijoter", en: "to simmer", ex: "Laisse mijoter la sauce 20 minutes.", exEn: "Let the sauce simmer for 20 minutes.", cat: "Cooking Verbs" },
+  { fr: "go\u00fbter", en: "to taste", ex: "Go\u00fbte la soupe et ajoute du sel.", exEn: "Taste the soup and add salt.", cat: "Cooking Verbs" },
+
+  { fr: "une recette", en: "a recipe", ex: "J'aime suivre des recettes sur Internet.", exEn: "I like to follow recipes online.", cat: "Recipes & Taste" },
+  { fr: "sal\u00e9", en: "salty", ex: "Cette sauce est trop sal\u00e9e.", exEn: "This sauce is too salty.", cat: "Recipes & Taste" },
+  { fr: "sucr\u00e9", en: "sweet", ex: "Les desserts sont sucr\u00e9s.", exEn: "Desserts are sweet.", cat: "Recipes & Taste" },
+  { fr: "\u00e9pic\u00e9", en: "spicy", ex: "Ce curry est tr\u00e8s \u00e9pic\u00e9.", exEn: "This curry is very spicy.", cat: "Recipes & Taste" },
+  { fr: "d\u00e9licieux", en: "delicious", ex: "Le repas \u00e9tait d\u00e9licieux.", exEn: "The meal was delicious.", cat: "Recipes & Taste" },
+  { fr: "l\u00e9ger", en: "light", ex: "Je veux un repas l\u00e9ger ce soir.", exEn: "I want a light meal tonight.", cat: "Recipes & Taste" },
+];
+
+const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
+
+const CAT_COLORS = {
+  "Fruits & Vegetables": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
+  "Meat & Seafood": { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
+  "Dairy & Bakery": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Pantry Staples": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
+  "At the Store": { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
+  "Kitchen Tools": { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)", text: "rgb(67, 56, 202)" },
+  "Cooking Verbs": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
+  "Recipes & Taste": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function FlashCards() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [flipped, setFlipped] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [shuffled, setShuffled] = useState(false);
+  const [known, setKnown] = useState(new Set());
+  const [hideKnown, setHideKnown] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+
+  const deck = useMemo(() => {
+    let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
+    if (hideKnown) cards = cards.filter((_, i) => {
+      const globalIdx = CARDS.indexOf(cards === CARDS ? CARDS[i] : cards[i]);
+      return !known.has(globalIdx);
+    });
+    return shuffled ? shuffle(cards) : cards;
+  }, [activeCat, shuffled, hideKnown, known]);
+
+  const safeIndex = Math.min(index, Math.max(0, deck.length - 1));
+  const card = deck[safeIndex];
+  const globalIdx = card ? CARDS.indexOf(card) : -1;
+
+  const next = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
+  const prev = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.max(i - 1, 0)); }, []);
+  const toggleKnown = useCallback(() => {
+    if (globalIdx < 0) return;
+    setKnown(prev => {
+      const s = new Set(prev);
+      s.has(globalIdx) ? s.delete(globalIdx) : s.add(globalIdx);
+      return s;
+    });
+  }, [globalIdx]);
+
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Fruits & Vegetables"];
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === " ") { e.preventDefault(); setFlipped(f => !f); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  // Swipe support for mobile
+  const [touchStart, setTouchStart] = useState(null);
+  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 50) { diff > 0 ? prev() : next(); }
+    setTouchStart(null);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
+            Les Courses et la Cuisine
+          </h1>
+          <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
+            {CARDS.length} words &amp; phrases for shopping and cooking in French
+          </p>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+          <button
+            onClick={() => { setActiveCat("All"); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+            style={{
+              padding: "5px 12px", borderRadius: 20, border: "2px solid",
+              borderColor: activeCat === "All" ? "#475569" : "#cbd5e1",
+              background: activeCat === "All" ? "#475569" : "white",
+              color: activeCat === "All" ? "white" : "#475569",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >All ({CARDS.length})</button>
+          {CATEGORIES.map(cat => {
+            const c = CAT_COLORS[cat];
+            const count = CARDS.filter(x => x.cat === cat).length;
+            return (
+              <button key={cat}
+                onClick={() => { setActiveCat(cat); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "2px solid",
+                  borderColor: activeCat === cat ? c.border : "#cbd5e1",
+                  background: activeCat === cat ? c.bg : "white",
+                  color: activeCat === cat ? c.text : "#64748b",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+                }}
+              >{cat} ({count})</button>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={shuffled} onChange={() => { setShuffled(!shuffled); setIndex(0); setFlipped(false); }} />
+            Shuffle
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={hideKnown} onChange={() => { setHideKnown(!hideKnown); setIndex(0); setFlipped(false); }} />
+            Hide known ({known.size})
+          </label>
+          {known.size > 0 && (
+            <button onClick={() => setKnown(new Set())}
+              style={{ fontSize: 12, color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+              Reset
+            </button>
+          )}
+        </div>
+
+        {deck.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 60, color: "#64748b" }}>
+            <p style={{ fontSize: 18 }}>You know all the cards in this category!</p>
+            <button onClick={() => { setHideKnown(false); }}
+              style={{ marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none", background: "#475569", color: "white", cursor: "pointer" }}>
+              Show all cards
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${((safeIndex + 1) / deck.length) * 100}%`, background: colors.border, borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: 10, fontSize: 14, color: "#64748b" }}>
+              {safeIndex + 1} / {deck.length}
+              {card && <span style={{ marginLeft: 10, padding: "2px 8px", borderRadius: 12, background: colors.bg, color: colors.text, fontSize: 11, fontWeight: 600 }}>{card.cat}</span>}
+            </div>
+
+            <div
+              onClick={() => setFlipped(!flipped)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              style={{
+                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 320,
+                userSelect: "none", WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <div style={{
+                position: "relative", width: "100%", height: "100%",
+                transformStyle: "preserve-3d", transition: "transform 0.5s",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              }}>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: "#1e293b", textAlign: "center", lineHeight: 1.3 }}>
+                    {card?.fr}
+                  </div>
+                  <div style={{ marginTop: 14, fontSize: 13, color: "#94a3b8" }}>
+                    Tap to reveal
+                  </div>
+                </div>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  background: `linear-gradient(145deg, ${colors.bg}, white)`,
+                  borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                  overflow: "auto",
+                }}>
+                  <div style={{ fontSize: 26, fontWeight: 700, color: colors.text, textAlign: "center" }}>
+                    {card?.en}
+                  </div>
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setShowTranslation(s => !s); }}
+                    style={{
+                      marginTop: 20, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
+                      borderRadius: 10, borderLeft: `4px solid ${colors.border}`, width: "100%", maxWidth: 400,
+                      cursor: "pointer", position: "relative", transition: "background 0.2s",
+                    }}
+                  >
+                    <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic", lineHeight: 1.5 }}>
+                      {card?.ex}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 5, textAlign: "center" }}>
+                      {showTranslation ? "Tap to hide translation" : "Tap for English translation"}
+                    </div>
+                    {showTranslation && (
+                      <div style={{
+                        marginTop: 8, padding: "8px 12px",
+                        background: "white", borderRadius: 8,
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                        fontSize: 14, color: "#475569", lineHeight: 1.5,
+                      }}>
+                        {card?.exEn}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+              <button onClick={prev} disabled={safeIndex === 0}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === 0 ? "#f1f5f9" : "white", color: safeIndex === 0 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === 0 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2190"}</button>
+
+              <button onClick={toggleKnown}
+                style={{
+                  padding: "10px 20px", borderRadius: 10,
+                  border: `2px solid ${known.has(globalIdx) ? "#22c55e" : "#cbd5e1"}`,
+                  background: known.has(globalIdx) ? "#dcfce7" : "white",
+                  color: known.has(globalIdx) ? "#15803d" : "#64748b",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                }}>
+                {known.has(globalIdx) ? "Known" : "Mark as known"}
+              </button>
+
+              <button onClick={next} disabled={safeIndex >= deck.length - 1}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex >= deck.length - 1 ? "#f1f5f9" : "white",
+                  color: safeIndex >= deck.length - 1 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex >= deck.length - 1 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2192"}</button>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: "#94a3b8" }}>
+              Swipe or use arrow keys to navigate, tap card or spacebar to flip
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FlashCards />);
+</script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="La Vie Sociale">
+<meta name="theme-color" content="#f8fafc">
+<title>La Vie Sociale — French Flash Cards</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjZWMxYzI0Ii8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJzZXJpZiI+RnI8L3RleHQ+PC9zdmc+">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useEffect } = React;
+
+const CARDS = [
+  { fr: "salut", en: "hi / hello", ex: "Salut ! \u00c7a va ?", exEn: "Hi! How are you?", cat: "Greetings & Introductions" },
+  { fr: "bonjour", en: "hello / good day", ex: "Bonjour, comment allez-vous ?", exEn: "Hello, how are you?", cat: "Greetings & Introductions" },
+  { fr: "bonsoir", en: "good evening", ex: "Bonsoir, heureux de vous rencontrer.", exEn: "Good evening, pleased to meet you.", cat: "Greetings & Introductions" },
+  { fr: "bonne nuit", en: "good night", ex: "Bonne nuit ! \u00c0 demain.", exEn: "Good night! See you tomorrow.", cat: "Greetings & Introductions" },
+  { fr: "au revoir", en: "goodbye", ex: "Au revoir et merci pour tout.", exEn: "Goodbye and thank you for everything.", cat: "Greetings & Introductions" },
+  { fr: "\u00e0 bient\u00f4t", en: "see you soon", ex: "\u00c0 bient\u00f4t ! On se voit demain.", exEn: "See you soon! We'll see each other tomorrow.", cat: "Greetings & Introductions" },
+  { fr: "\u00e0 plus tard", en: "see you later", ex: "\u00c0 plus tard ! Je dois partir.", exEn: "See you later! I have to go.", cat: "Greetings & Introductions" },
+  { fr: "enchanté(e)", en: "pleased to meet you", ex: "Enchanté de faire votre connaissance.", exEn: "Pleased to make your acquaintance.", cat: "Greetings & Introductions" },
+  { fr: "se présenter", en: "to introduce oneself", ex: "Je me présente : je m'appelle Marie.", exEn: "Let me introduce myself: my name is Marie.", cat: "Greetings & Introductions" },
+  { fr: "mon nom est", en: "my name is", ex: "Mon nom est Jean.", exEn: "My name is Jean.", cat: "Greetings & Introductions" },
+
+  { fr: "\u00e7a va ?", en: "how are you?", ex: "\u00c7a va bien, merci.", exEn: "I'm doing well, thank you.", cat: "Small Talk" },
+  { fr: "quoi de neuf ?", en: "what's new?", ex: "Quoi de neuf dans ta vie ?", exEn: "What's new in your life?", cat: "Small Talk" },
+  { fr: "comment \u00e7a va ?", en: "how are you?", ex: "Comment \u00e7a va au travail ?", exEn: "How are things at work?", cat: "Small Talk" },
+  { fr: "du beau temps", en: "nice weather", ex: "Il fait du beau temps aujourd'hui.", exEn: "It's nice weather today.", cat: "Small Talk" },
+  { fr: "il pleut", en: "it's raining", ex: "Il pleut beaucoup en automne.", exEn: "It rains a lot in fall.", cat: "Small Talk" },
+  { fr: "il fait froid", en: "it's cold", ex: "Il fait froid ce matin.", exEn: "It's cold this morning.", cat: "Small Talk" },
+  { fr: "il fait chaud", en: "it's hot", ex: "Il fait tr\u00e8s chaud en \u00e9t\u00e9.", exEn: "It's very hot in summer.", cat: "Small Talk" },
+  { fr: "le week-end", en: "the weekend", ex: "Qu'est-ce que tu fais ce week-end ?", exEn: "What are you doing this weekend?", cat: "Small Talk" },
+  { fr: "comment s'est pass\u00e9 ?", en: "how did it go?", ex: "Comment s'est pass\u00e9e ta journ\u00e9e ?", exEn: "How was your day?", cat: "Small Talk" },
+  { fr: "tu as fait quoi ?", en: "what did you do?", ex: "Tu as fait quoi pendant les vacances ?", exEn: "What did you do during vacation?", cat: "Small Talk" },
+
+  { fr: "je pense que", en: "I think that", ex: "Je pense que c'est une bonne id\u00e9e.", exEn: "I think it's a good idea.", cat: "Expressing Opinions" },
+  { fr: "\u00e0 mon avis", en: "in my opinion", ex: "\u00c0 mon avis, ce film est excellent.", exEn: "In my opinion, this film is excellent.", cat: "Expressing Opinions" },
+  { fr: "selon moi", en: "according to me", ex: "Selon moi, c'est trop cher.", exEn: "According to me, it's too expensive.", cat: "Expressing Opinions" },
+  { fr: "\u00eatre d'accord", en: "to agree", ex: "Je suis d'accord avec toi.", exEn: "I agree with you.", cat: "Expressing Opinions" },
+  { fr: "\u00eatre en d\u00e9saccord", en: "to disagree", ex: "Je suis en d\u00e9saccord sur ce point.", exEn: "I disagree on this point.", cat: "Expressing Opinions" },
+  { fr: "c'est vrai", en: "that's true", ex: "C'est vrai, je n'avais pas pens\u00e9 \u00e0 \u00e7a.", exEn: "That's true, I hadn't thought of that.", cat: "Expressing Opinions" },
+  { fr: "c'est faux", en: "that's false", ex: "C'est faux, ce ne sont pas les faits.", exEn: "That's false, those aren't the facts.", cat: "Expressing Opinions" },
+  { fr: "peut-\u00eatre", en: "maybe / perhaps", ex: "Peut-\u00eatre qu'il viendra demain.", exEn: "Maybe he'll come tomorrow.", cat: "Expressing Opinions" },
+
+  { fr: "content(e)", en: "happy / pleased", ex: "Je suis content d'avoir gagn\u00e9.", exEn: "I'm happy to have won.", cat: "Emotions & Reactions" },
+  { fr: "heureux/euse", en: "happy", ex: "Elle est tr\u00e8s heureuse de ce r\u00e9sultat.", exEn: "She's very happy with this result.", cat: "Emotions & Reactions" },
+  { fr: "triste", en: "sad", ex: "Il est triste depuis son d\u00e9part.", exEn: "He's been sad since his departure.", cat: "Emotions & Reactions" },
+  { fr: "surpris(e)", en: "surprised", ex: "J'ai \u00e9t\u00e9 tr\u00e8s surpris par cette nouvelle.", exEn: "I was very surprised by this news.", cat: "Emotions & Reactions" },
+  { fr: "d\u00e9\u00e7u(e)", en: "disappointed", ex: "Je suis d\u00e9\u00e7u par les r\u00e9sultats.", exEn: "I'm disappointed with the results.", cat: "Emotions & Reactions" },
+  { fr: "anxieux/euse", en: "anxious", ex: "Il est anxieux avant l'examen.", exEn: "He's anxious before the exam.", cat: "Emotions & Reactions" },
+  { fr: "s'inqui\u00e9ter", en: "to worry", ex: "Ne t'inqui\u00e8te pas, tout ira bien.", exEn: "Don't worry, everything will be fine.", cat: "Emotions & Reactions" },
+  { fr: "furieux/euse", en: "furious", ex: "Elle est furieuse \u00e0 cause de ce mensonge.", exEn: "She's furious because of this lie.", cat: "Emotions & Reactions" },
+  { fr: "aimer", en: "to like / love", ex: "J'aime beaucoup cette chanson.", exEn: "I really like this song.", cat: "Emotions & Reactions" },
+
+  { fr: "on se retrouve", en: "let's meet up", ex: "On se retrouve demain soir ?", exEn: "Shall we meet tomorrow evening?", cat: "Making Plans" },
+  { fr: "\u00eatre libre", en: "to be free / available", ex: "Es-tu libre samedi ?", exEn: "Are you free on Saturday?", cat: "Making Plans" },
+  { fr: "proposer", en: "to propose / suggest", ex: "Je propose d'aller au cin\u00e9ma.", exEn: "I suggest going to the cinema.", cat: "Making Plans" },
+  { fr: "organiser", en: "to organize", ex: "On organise une fête ce week-end.", exEn: "We're organizing a party this weekend.", cat: "Making Plans" },
+  { fr: "annuler", en: "to cancel", ex: "Je dois annuler notre rendez-vous.", exEn: "I have to cancel our meeting.", cat: "Making Plans" },
+  { fr: "reporter", en: "to postpone", ex: "On peut reporter la r\u00e9union ?", exEn: "Can we postpone the meeting?", cat: "Making Plans" },
+  { fr: "confirmer", en: "to confirm", ex: "Tu peux confirmer que tu viendras ?", exEn: "Can you confirm that you'll come?", cat: "Making Plans" },
+  { fr: "avoir le temps", en: "to have time", ex: "Je n'ai pas le temps aujourd'hui.", exEn: "I don't have time today.", cat: "Making Plans" },
+  { fr: "se donner rendez-vous", en: "to arrange to meet", ex: "On se donne rendez-vous dans une heure.", exEn: "Let's arrange to meet in an hour.", cat: "Making Plans" },
+  { fr: "quelle heure ?", en: "what time?", ex: "La r\u00e9union est quelle heure ?", exEn: "What time is the meeting?", cat: "Making Plans" },
+
+  { fr: "appeler", en: "to call", ex: "Je t'appelle ce soir.", exEn: "I'll call you tonight.", cat: "Phone & Messaging" },
+  { fr: "envoyer un message", en: "to send a message", ex: "Je vais t'envoyer un message.", exEn: "I'll send you a message.", cat: "Phone & Messaging" },
+  { fr: "d\u00e9crocher", en: "to pick up / answer", ex: "D\u00e9croche ! Je t'appelle.", exEn: "Pick up! I'm calling you.", cat: "Phone & Messaging" },
+  { fr: "raccrocher", en: "to hang up", ex: "Il a raccroch\u00e9 sans dire au revoir.", exEn: "He hung up without saying goodbye.", cat: "Phone & Messaging" },
+  { fr: "laisser un message", en: "to leave a message", ex: "Laisse un message si je ne r\u00e9ponds pas.", exEn: "Leave a message if I don't answer.", cat: "Phone & Messaging" },
+  { fr: "un texte / un SMS", en: "a text message", ex: "Envoie-moi un SMS quand tu seras l\u00e0.", exEn: "Send me a text when you get there.", cat: "Phone & Messaging" },
+  { fr: "r\u00e9pondre", en: "to answer / reply", ex: "Je vais r\u00e9pondre \u00e0 son message.", exEn: "I'll reply to his message.", cat: "Phone & Messaging" },
+  { fr: "ignorer", en: "to ignore", ex: "Il ignore mes messages.", exEn: "He's ignoring my messages.", cat: "Phone & Messaging" },
+
+  { fr: "excusez-moi", en: "excuse me", ex: "Excusez-moi, quelle heure est-il ?", exEn: "Excuse me, what time is it?", cat: "Polite Expressions" },
+  { fr: "d\u00e9sol\u00e9(e)", en: "sorry", ex: "Je suis vraiment d\u00e9sol\u00e9 pour le d\u00e9lai.", exEn: "I'm really sorry for the delay.", cat: "Polite Expressions" },
+  { fr: "je vous en prie", en: "you're welcome / please", ex: "Merci beaucoup. - Je vous en prie.", exEn: "Thank you very much. - You're welcome.", cat: "Polite Expressions" },
+  { fr: "\u00e7a ne fait rien", en: "it doesn't matter", ex: "\u00c7a ne fait rien, c'est facile \u00e0 refaire.", exEn: "It doesn't matter, it's easy to redo.", cat: "Polite Expressions" },
+  { fr: "f\u00e9licitations", en: "congratulations", ex: "F\u00e9licitations pour ton promotion !", exEn: "Congratulations on your promotion!", cat: "Polite Expressions" },
+  { fr: "merci beaucoup", en: "thank you very much", ex: "Merci beaucoup pour ton aide.", exEn: "Thank you very much for your help.", cat: "Polite Expressions" },
+  { fr: "de rien", en: "you're welcome", ex: "De rien, j'ai plaisir \u00e0 t'aider.", exEn: "You're welcome, I'm happy to help.", cat: "Polite Expressions" },
+  { fr: "s'il te pla\u00eet", en: "please (informal)", ex: "S'il te pla\u00eet, aide-moi.", exEn: "Please, help me.", cat: "Polite Expressions" },
+  { fr: "s'il vous pla\u00eet", en: "please (formal)", ex: "S'il vous pla\u00eet, pouvez-vous m'aider ?", exEn: "Please, can you help me?", cat: "Polite Expressions" },
+  { fr: "au secours", en: "help / help!", ex: "Au secours ! J'ai besoin d'aide.", exEn: "Help! I need assistance.", cat: "Polite Expressions" },
+
+  { fr: "f\u00eater", en: "to celebrate", ex: "On va f\u00eater ton anniversaire samedi.", exEn: "We're going to celebrate your birthday on Saturday.", cat: "Celebrations & Events" },
+  { fr: "un anniversaire", en: "a birthday", ex: "C'est mon anniversaire demain.", exEn: "It's my birthday tomorrow.", cat: "Celebrations & Events" },
+  { fr: "trinquer", en: "to make a toast", ex: "On trinque \u00e0 votre sant\u00e9 !", exEn: "Let's toast to your health!", cat: "Celebrations & Events" },
+  { fr: "un cadeau", en: "a gift / present", ex: "Tu as aim\u00e9 ton cadeau ?", exEn: "Did you like your gift?", cat: "Celebrations & Events" },
+  { fr: "une f\u00eate", en: "a party / celebration", ex: "La f\u00eate est demain soir.", exEn: "The party is tomorrow evening.", cat: "Celebrations & Events" },
+  { fr: "un m\u00e9tier", en: "a profession", ex: "Quel est ton m\u00e9tier ?", exEn: "What's your profession?", cat: "Celebrations & Events" },
+  { fr: "mariage", en: "marriage / wedding", ex: "Ils c\u00e9l\u00e8brent leur mariage le mois prochain.", exEn: "They're celebrating their wedding next month.", cat: "Celebrations & Events" },
+  { fr: "b\u00eate blessur\u00e9e", en: "bêtes blessées", ex: "", exEn: "", cat: "Celebrations & Events" },
+  { fr: "un repas festif", en: "a festive meal", ex: "C'est un repas festif tr\u00e8s appr\u00e9ci\u00e9.", exEn: "It's a very much appreciated festive meal.", cat: "Celebrations & Events" },
+];
+
+const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
+
+const CAT_COLORS = {
+  "Greetings & Introductions": { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
+  "Small Talk": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
+  "Expressing Opinions": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
+  "Emotions & Reactions": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Making Plans": { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
+  "Phone & Messaging": { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)", text: "rgb(67, 56, 202)" },
+  "Polite Expressions": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
+  "Celebrations & Events": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function FlashCards() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [flipped, setFlipped] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [shuffled, setShuffled] = useState(false);
+  const [known, setKnown] = useState(new Set());
+  const [hideKnown, setHideKnown] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+
+  const deck = useMemo(() => {
+    let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
+    if (hideKnown) cards = cards.filter((_, i) => {
+      const globalIdx = CARDS.indexOf(cards === CARDS ? CARDS[i] : cards[i]);
+      return !known.has(globalIdx);
+    });
+    return shuffled ? shuffle(cards) : cards;
+  }, [activeCat, shuffled, hideKnown, known]);
+
+  const safeIndex = Math.min(index, Math.max(0, deck.length - 1));
+  const card = deck[safeIndex];
+  const globalIdx = card ? CARDS.indexOf(card) : -1;
+
+  const next = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
+  const prev = useCallback(() => { setFlipped(false); setShowTranslation(false); setIndex(i => Math.max(i - 1, 0)); }, []);
+  const toggleKnown = useCallback(() => {
+    if (globalIdx < 0) return;
+    setKnown(prev => {
+      const s = new Set(prev);
+      s.has(globalIdx) ? s.delete(globalIdx) : s.add(globalIdx);
+      return s;
+    });
+  }, [globalIdx]);
+
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Greetings & Introductions"];
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === " ") { e.preventDefault(); setFlipped(f => !f); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  // Swipe support for mobile
+  const [touchStart, setTouchStart] = useState(null);
+  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 50) { diff > 0 ? prev() : next(); }
+    setTouchStart(null);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
+            La Vie Sociale
+          </h1>
+          <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
+            {CARDS.length} words &amp; phrases for socializing in French
+          </p>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+          <button
+            onClick={() => { setActiveCat("All"); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+            style={{
+              padding: "5px 12px", borderRadius: 20, border: "2px solid",
+              borderColor: activeCat === "All" ? "#475569" : "#cbd5e1",
+              background: activeCat === "All" ? "#475569" : "white",
+              color: activeCat === "All" ? "white" : "#475569",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >All ({CARDS.length})</button>
+          {CATEGORIES.map(cat => {
+            const c = CAT_COLORS[cat];
+            const count = CARDS.filter(x => x.cat === cat).length;
+            return (
+              <button key={cat}
+                onClick={() => { setActiveCat(cat); setIndex(0); setFlipped(false); setShowTranslation(false); }}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "2px solid",
+                  borderColor: activeCat === cat ? c.border : "#cbd5e1",
+                  background: activeCat === cat ? c.bg : "white",
+                  color: activeCat === cat ? c.text : "#64748b",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+                }}
+              >{cat} ({count})</button>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={shuffled} onChange={() => { setShuffled(!shuffled); setIndex(0); setFlipped(false); }} />
+            Shuffle
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={hideKnown} onChange={() => { setHideKnown(!hideKnown); setIndex(0); setFlipped(false); }} />
+            Hide known ({known.size})
+          </label>
+          {known.size > 0 && (
+            <button onClick={() => setKnown(new Set())}
+              style={{ fontSize: 12, color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+              Reset
+            </button>
+          )}
+        </div>
+
+        {deck.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 60, color: "#64748b" }}>
+            <p style={{ fontSize: 18 }}>You know all the cards in this category!</p>
+            <button onClick={() => { setHideKnown(false); }}
+              style={{ marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none", background: "#475569", color: "white", cursor: "pointer" }}>
+              Show all cards
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${((safeIndex + 1) / deck.length) * 100}%`, background: colors.border, borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+
+            <div style={{ textAlign: "center", marginBottom: 10, fontSize: 14, color: "#64748b" }}>
+              {safeIndex + 1} / {deck.length}
+              {card && <span style={{ marginLeft: 10, padding: "2px 8px", borderRadius: 12, background: colors.bg, color: colors.text, fontSize: 11, fontWeight: 600 }}>{card.cat}</span>}
+            </div>
+
+            <div
+              onClick={() => setFlipped(!flipped)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              style={{
+                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 320,
+                userSelect: "none", WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <div style={{
+                position: "relative", width: "100%", height: "100%",
+                transformStyle: "preserve-3d", transition: "transform 0.5s",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              }}>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: "#1e293b", textAlign: "center", lineHeight: 1.3 }}>
+                    {card?.fr}
+                  </div>
+                  <div style={{ marginTop: 14, fontSize: 13, color: "#94a3b8" }}>
+                    Tap to reveal
+                  </div>
+                </div>
+                <div style={{
+                  position: "absolute", inset: 0, backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  background: `linear-gradient(145deg, ${colors.bg}, white)`,
+                  borderRadius: 16, border: `3px solid ${colors.border}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                  overflow: "auto",
+                }}>
+                  <div style={{ fontSize: 26, fontWeight: 700, color: colors.text, textAlign: "center" }}>
+                    {card?.en}
+                  </div>
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setShowTranslation(s => !s); }}
+                    style={{
+                      marginTop: 20, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
+                      borderRadius: 10, borderLeft: `4px solid ${colors.border}`, width: "100%", maxWidth: 400,
+                      cursor: "pointer", position: "relative", transition: "background 0.2s",
+                    }}
+                  >
+                    <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic", lineHeight: 1.5 }}>
+                      {card?.ex}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 5, textAlign: "center" }}>
+                      {showTranslation ? "Tap to hide translation" : "Tap for English translation"}
+                    </div>
+                    {showTranslation && (
+                      <div style={{
+                        marginTop: 8, padding: "8px 12px",
+                        background: "white", borderRadius: 8,
+                        border: `1px solid ${colors.border}`,
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                        fontSize: 14, color: "#475569", lineHeight: 1.5,
+                      }}>
+                        {card?.exEn}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+              <button onClick={prev} disabled={safeIndex === 0}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === 0 ? "#f1f5f9" : "white", color: safeIndex === 0 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === 0 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2190"}</button>
+
+              <button onClick={toggleKnown}
+                style={{
+                  padding: "10px 20px", borderRadius: 10,
+                  border: `2px solid ${known.has(globalIdx) ? "#22c55e" : "#cbd5e1"}`,
+                  background: known.has(globalIdx) ? "#dcfce7" : "white",
+                  color: known.has(globalIdx) ? "#15803d" : "#64748b",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                }}>
+                {known.has(globalIdx) ? "Known" : "Mark as known"}
+              </button>
+
+              <button onClick={next} disabled={safeIndex >= deck.length - 1}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex >= deck.length - 1 ? "#f1f5f9" : "white",
+                  color: safeIndex >= deck.length - 1 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex >= deck.length - 1 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2192"}</button>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: "#94a3b8" }}>
+              Swipe or use arrow keys to navigate, tap card or spacebar to flip
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FlashCards />);
+</script>
+</body>
+</html>
