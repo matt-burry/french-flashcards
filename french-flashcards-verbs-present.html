@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Verbes">
+<meta name="theme-color" content="#f8fafc">
+<title>Les Verbes au Pr&eacute;sent — French Verb Conjugation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useEffect } = React;
+
+// 10 most common French verbs — present tense conjugation drill
+// Each card: sentence with blank, the infinitive (hint), the correct conjugated form, English translation
+const CARDS = [
+  // être (to be)
+  { sentence: "Je ___ fatigu\u00e9 apr\u00e8s le travail.", answer: "suis", infinitive: "\u00eatre", en: "I am tired after work.", subject: "je", cat: "\u00catre" },
+  { sentence: "Tu ___ vraiment gentil avec tout le monde.", answer: "es", infinitive: "\u00eatre", en: "You are really kind to everyone.", subject: "tu", cat: "\u00catre" },
+  { sentence: "Elle ___ m\u00e9decin depuis dix ans.", answer: "est", infinitive: "\u00eatre", en: "She has been a doctor for ten years.", subject: "il/elle", cat: "\u00catre" },
+  { sentence: "Nous ___ en retard pour le cours.", answer: "sommes", infinitive: "\u00eatre", en: "We are late for class.", subject: "nous", cat: "\u00catre" },
+  { sentence: "Vous ___ pr\u00eats pour partir ?", answer: "\u00eates", infinitive: "\u00eatre", en: "Are you ready to leave?", subject: "vous", cat: "\u00catre" },
+  { sentence: "Ils ___ contents de vous voir.", answer: "sont", infinitive: "\u00eatre", en: "They are happy to see you.", subject: "ils/elles", cat: "\u00catre" },
+
+  // avoir (to have)
+  { sentence: "J'___ une r\u00e9union \u00e0 quatorze heures.", answer: "ai", infinitive: "avoir", en: "I have a meeting at two o'clock.", subject: "je", cat: "Avoir" },
+  { sentence: "Tu ___ de la chance d'habiter ici.", answer: "as", infinitive: "avoir", en: "You're lucky to live here.", subject: "tu", cat: "Avoir" },
+  { sentence: "Il ___ trois enfants.", answer: "a", infinitive: "avoir", en: "He has three children.", subject: "il/elle", cat: "Avoir" },
+  { sentence: "Nous ___ besoin de plus de temps.", answer: "avons", infinitive: "avoir", en: "We need more time.", subject: "nous", cat: "Avoir" },
+  { sentence: "Vous ___ raison, c'est une bonne id\u00e9e.", answer: "avez", infinitive: "avoir", en: "You're right, it's a good idea.", subject: "vous", cat: "Avoir" },
+  { sentence: "Elles ___ envie de sortir ce soir.", answer: "ont", infinitive: "avoir", en: "They feel like going out tonight.", subject: "ils/elles", cat: "Avoir" },
+
+  // faire (to do/make)
+  { sentence: "Je ___ du sport le matin.", answer: "fais", infinitive: "faire", en: "I exercise in the morning.", subject: "je", cat: "Faire" },
+  { sentence: "Tu ___ quoi ce week-end ?", answer: "fais", infinitive: "faire", en: "What are you doing this weekend?", subject: "tu", cat: "Faire" },
+  { sentence: "Elle ___ un g\u00e2teau pour l'anniversaire.", answer: "fait", infinitive: "faire", en: "She is making a cake for the birthday.", subject: "il/elle", cat: "Faire" },
+  { sentence: "Nous ___ les courses le samedi.", answer: "faisons", infinitive: "faire", en: "We go grocery shopping on Saturdays.", subject: "nous", cat: "Faire" },
+  { sentence: "Vous ___ du bruit, s'il vous pla\u00eet, arr\u00eatez.", answer: "faites", infinitive: "faire", en: "You're making noise, please stop.", subject: "vous", cat: "Faire" },
+  { sentence: "Ils ___ la vaisselle apr\u00e8s le d\u00eener.", answer: "font", infinitive: "faire", en: "They do the dishes after dinner.", subject: "ils/elles", cat: "Faire" },
+
+  // aller (to go)
+  { sentence: "Je ___ au march\u00e9 tous les samedis.", answer: "vais", infinitive: "aller", en: "I go to the market every Saturday.", subject: "je", cat: "Aller" },
+  { sentence: "Tu ___ bien aujourd'hui ?", answer: "vas", infinitive: "aller", en: "Are you doing well today?", subject: "tu", cat: "Aller" },
+  { sentence: "On ___ au cin\u00e9ma ce soir.", answer: "va", infinitive: "aller", en: "We're going to the movies tonight.", subject: "il/elle", cat: "Aller" },
+  { sentence: "Nous ___ en France cet \u00e9t\u00e9.", answer: "allons", infinitive: "aller", en: "We're going to France this summer.", subject: "nous", cat: "Aller" },
+  { sentence: "Vous ___ souvent au restaurant ?", answer: "allez", infinitive: "aller", en: "Do you often go to restaurants?", subject: "vous", cat: "Aller" },
+  { sentence: "Elles ___ \u00e0 l'\u00e9cole \u00e0 pied.", answer: "vont", infinitive: "aller", en: "They walk to school.", subject: "ils/elles", cat: "Aller" },
+
+  // pouvoir (to be able to)
+  { sentence: "Je ___ t'aider demain matin.", answer: "peux", infinitive: "pouvoir", en: "I can help you tomorrow morning.", subject: "je", cat: "Pouvoir" },
+  { sentence: "Tu ___ r\u00e9p\u00e9ter, s'il te pla\u00eet ?", answer: "peux", infinitive: "pouvoir", en: "Can you repeat that, please?", subject: "tu", cat: "Pouvoir" },
+  { sentence: "Elle ___ parler trois langues.", answer: "peut", infinitive: "pouvoir", en: "She can speak three languages.", subject: "il/elle", cat: "Pouvoir" },
+  { sentence: "Nous ___ nous retrouver au caf\u00e9.", answer: "pouvons", infinitive: "pouvoir", en: "We can meet at the caf\u00e9.", subject: "nous", cat: "Pouvoir" },
+  { sentence: "Vous ___ entrer, la porte est ouverte.", answer: "pouvez", infinitive: "pouvoir", en: "You can come in, the door is open.", subject: "vous", cat: "Pouvoir" },
+  { sentence: "Ils ___ venir samedi si tu veux.", answer: "peuvent", infinitive: "pouvoir", en: "They can come Saturday if you want.", subject: "ils/elles", cat: "Pouvoir" },
+
+  // vouloir (to want)
+  { sentence: "Je ___ un caf\u00e9, s'il vous pla\u00eet.", answer: "veux", infinitive: "vouloir", en: "I'd like a coffee, please.", subject: "je", cat: "Vouloir" },
+  { sentence: "Tu ___ venir avec nous ?", answer: "veux", infinitive: "vouloir", en: "Do you want to come with us?", subject: "tu", cat: "Vouloir" },
+  { sentence: "Il ___ devenir professeur.", answer: "veut", infinitive: "vouloir", en: "He wants to become a teacher.", subject: "il/elle", cat: "Vouloir" },
+  { sentence: "Nous ___ r\u00e9server une table pour ce soir.", answer: "voulons", infinitive: "vouloir", en: "We want to reserve a table for tonight.", subject: "nous", cat: "Vouloir" },
+  { sentence: "Vous ___ autre chose ?", answer: "voulez", infinitive: "vouloir", en: "Would you like anything else?", subject: "vous", cat: "Vouloir" },
+  { sentence: "Elles ___ apprendre le fran\u00e7ais.", answer: "veulent", infinitive: "vouloir", en: "They want to learn French.", subject: "ils/elles", cat: "Vouloir" },
+
+  // devoir (must / to have to)
+  { sentence: "Je ___ partir avant six heures.", answer: "dois", infinitive: "devoir", en: "I have to leave before six.", subject: "je", cat: "Devoir" },
+  { sentence: "Tu ___ finir tes devoirs d'abord.", answer: "dois", infinitive: "devoir", en: "You have to finish your homework first.", subject: "tu", cat: "Devoir" },
+  { sentence: "Elle ___ travailler ce week-end.", answer: "doit", infinitive: "devoir", en: "She has to work this weekend.", subject: "il/elle", cat: "Devoir" },
+  { sentence: "Nous ___ \u00e9conomiser plus d'argent.", answer: "devons", infinitive: "devoir", en: "We must save more money.", subject: "nous", cat: "Devoir" },
+  { sentence: "Vous ___ signer ici, s'il vous pla\u00eet.", answer: "devez", infinitive: "devoir", en: "You must sign here, please.", subject: "vous", cat: "Devoir" },
+  { sentence: "Ils ___ se d\u00e9p\u00eacher pour attraper le train.", answer: "doivent", infinitive: "devoir", en: "They have to hurry to catch the train.", subject: "ils/elles", cat: "Devoir" },
+
+  // savoir (to know)
+  { sentence: "Je ___ o\u00f9 il habite.", answer: "sais", infinitive: "savoir", en: "I know where he lives.", subject: "je", cat: "Savoir" },
+  { sentence: "Tu ___ nager ?", answer: "sais", infinitive: "savoir", en: "Do you know how to swim?", subject: "tu", cat: "Savoir" },
+  { sentence: "Elle ___ parler japonais.", answer: "sait", infinitive: "savoir", en: "She knows how to speak Japanese.", subject: "il/elle", cat: "Savoir" },
+  { sentence: "Nous ___ que c'est difficile.", answer: "savons", infinitive: "savoir", en: "We know it's difficult.", subject: "nous", cat: "Savoir" },
+  { sentence: "Vous ___ \u00e0 quelle heure commence le film ?", answer: "savez", infinitive: "savoir", en: "Do you know what time the movie starts?", subject: "vous", cat: "Savoir" },
+  { sentence: "Ils ___ tr\u00e8s bien cuisiner.", answer: "savent", infinitive: "savoir", en: "They know how to cook very well.", subject: "ils/elles", cat: "Savoir" },
+
+  // dire (to say/tell)
+  { sentence: "Je ___ toujours la v\u00e9rit\u00e9.", answer: "dis", infinitive: "dire", en: "I always tell the truth.", subject: "je", cat: "Dire" },
+  { sentence: "Tu ___ n'importe quoi !", answer: "dis", infinitive: "dire", en: "You're talking nonsense!", subject: "tu", cat: "Dire" },
+  { sentence: "On ___ que ce restaurant est excellent.", answer: "dit", infinitive: "dire", en: "They say this restaurant is excellent.", subject: "il/elle", cat: "Dire" },
+  { sentence: "Nous ___ au revoir \u00e0 nos amis.", answer: "disons", infinitive: "dire", en: "We say goodbye to our friends.", subject: "nous", cat: "Dire" },
+  { sentence: "Vous ___ que vous \u00eates d'accord ?", answer: "dites", infinitive: "dire", en: "You say that you agree?", subject: "vous", cat: "Dire" },
+  { sentence: "Ils ___ que c'est trop cher.", answer: "disent", infinitive: "dire", en: "They say it's too expensive.", subject: "ils/elles", cat: "Dire" },
+
+  // venir (to come)
+  { sentence: "Je ___ de Lyon.", answer: "viens", infinitive: "venir", en: "I come from Lyon.", subject: "je", cat: "Venir" },
+  { sentence: "Tu ___ \u00e0 la f\u00eate samedi ?", answer: "viens", infinitive: "venir", en: "Are you coming to the party Saturday?", subject: "tu", cat: "Venir" },
+  { sentence: "Il ___ nous rendre visite chaque \u00e9t\u00e9.", answer: "vient", infinitive: "venir", en: "He comes to visit us every summer.", subject: "il/elle", cat: "Venir" },
+  { sentence: "Nous ___ d'arriver, donne-nous cinq minutes.", answer: "venons", infinitive: "venir", en: "We just arrived, give us five minutes.", subject: "nous", cat: "Venir" },
+  { sentence: "Vous ___ souvent ici ?", answer: "venez", infinitive: "venir", en: "Do you come here often?", subject: "vous", cat: "Venir" },
+  { sentence: "Elles ___ de Paris en train.", answer: "viennent", infinitive: "venir", en: "They come from Paris by train.", subject: "ils/elles", cat: "Venir" },
+];
+
+const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
+
+const CAT_COLORS = {
+  "\u00catre":   { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)",  text: "rgb(185, 28, 28)" },
+  "Avoir":   { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Faire":   { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)",  text: "rgb(29, 78, 216)" },
+  "Aller":   { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)",   text: "rgb(21, 128, 61)" },
+  "Pouvoir": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)",  text: "rgb(126, 34, 206)" },
+  "Vouloir": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)",  text: "rgb(194, 65, 12)" },
+  "Devoir":  { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)",  text: "rgb(67, 56, 202)" },
+  "Savoir":  { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+  "Dire":    { bg: "rgb(252, 231, 243)", border: "rgb(236, 72, 153)",  text: "rgb(190, 24, 93)" },
+  "Venir":   { bg: "rgb(236, 253, 245)", border: "rgb(16, 185, 129)", text: "rgb(4, 120, 87)" },
+};
+
+const SUBJECT_LABELS = { "je": "je", "tu": "tu", "il/elle": "il / elle / on", "nous": "nous", "vous": "vous", "ils/elles": "ils / elles" };
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function FlashCards() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [index, setIndex] = useState(0);
+  const [shuffledMode, setShuffledMode] = useState(false);
+  const [known, setKnown] = useState(new Set());
+  const [hideKnown, setHideKnown] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  const deck = useMemo(() => {
+    let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
+    if (hideKnown) cards = cards.filter(c => !known.has(CARDS.indexOf(c)));
+    return shuffledMode ? shuffle(cards) : cards;
+  }, [activeCat, shuffledMode, hideKnown, known]);
+
+  const safeIndex = Math.min(index, Math.max(0, deck.length - 1));
+  const card = deck[safeIndex];
+  const globalIdx = card ? CARDS.indexOf(card) : -1;
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["\u00catre"];
+
+  const resetCard = () => { setShowHint(false); setShowAnswer(false); };
+  const next = useCallback(() => { resetCard(); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
+  const prev = useCallback(() => { resetCard(); setIndex(i => Math.max(i - 1, 0)); }, []);
+  const toggleKnown = useCallback(() => {
+    if (globalIdx < 0) return;
+    setKnown(prev => {
+      const s = new Set(prev);
+      s.has(globalIdx) ? s.delete(globalIdx) : s.add(globalIdx);
+      return s;
+    });
+  }, [globalIdx]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === " ") { e.preventDefault(); setShowAnswer(a => !a); }
+      else if (e.key === "h" || e.key === "H") setShowHint(h => !h);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  const [touchStart, setTouchStart] = useState(null);
+  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 50) { diff > 0 ? prev() : next(); }
+    setTouchStart(null);
+  };
+
+  // Render the sentence with the blank highlighted
+  const renderSentence = () => {
+    if (!card) return null;
+    const parts = card.sentence.split("___");
+    return (
+      <div style={{ fontSize: 24, color: "#1e293b", lineHeight: 1.6, textAlign: "center", fontWeight: 500 }}>
+        {parts[0]}
+        <span style={{
+          display: "inline-block", minWidth: showAnswer ? "auto" : 80,
+          borderBottom: showAnswer ? "none" : "3px solid " + colors.border,
+          padding: "2px 8px", margin: "0 4px",
+          background: showAnswer ? colors.bg : "transparent",
+          borderRadius: showAnswer ? 6 : 0,
+          color: showAnswer ? colors.text : "transparent",
+          fontWeight: 700, fontSize: 26,
+          transition: "all 0.3s",
+        }}>
+          {showAnswer ? card.answer : "\u00a0"}
+        </span>
+        {parts[1]}
+      </div>
+    );
+  };
+
+  return (
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))", boxSizing: "border-box" }}
+    >
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
+            Les Verbes au Pr\u00e9sent
+          </h1>
+          <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
+            Complete the sentence with the correct conjugation
+          </p>
+        </div>
+
+        {/* Verb filter pills */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+          <button
+            onClick={() => { setActiveCat("All"); setIndex(0); resetCard(); }}
+            style={{
+              padding: "5px 12px", borderRadius: 20, border: "2px solid",
+              borderColor: activeCat === "All" ? "#475569" : "#cbd5e1",
+              background: activeCat === "All" ? "#475569" : "white",
+              color: activeCat === "All" ? "white" : "#475569",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >All ({CARDS.length})</button>
+          {CATEGORIES.map(cat => {
+            const c = CAT_COLORS[cat];
+            const count = CARDS.filter(x => x.cat === cat).length;
+            return (
+              <button key={cat}
+                onClick={() => { setActiveCat(cat); setIndex(0); resetCard(); }}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "2px solid",
+                  borderColor: activeCat === cat ? c.border : "#cbd5e1",
+                  background: activeCat === cat ? c.bg : "white",
+                  color: activeCat === cat ? c.text : "#64748b",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+                }}
+              >{cat}</button>
+            );
+          })}
+        </div>
+
+        {/* Controls */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={shuffledMode} onChange={() => { setShuffledMode(!shuffledMode); setIndex(0); resetCard(); }} />
+            Shuffle
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={hideKnown} onChange={() => { setHideKnown(!hideKnown); setIndex(0); resetCard(); }} />
+            Hide known ({known.size})
+          </label>
+          {known.size > 0 && (
+            <button onClick={() => setKnown(new Set())}
+              style={{ fontSize: 12, color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+              Reset
+            </button>
+          )}
+        </div>
+
+        {deck.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 60, color: "#64748b" }}>
+            <p style={{ fontSize: 18 }}>You know all the cards in this category!</p>
+            <button onClick={() => { setHideKnown(false); }}
+              style={{ marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none", background: "#475569", color: "white", cursor: "pointer" }}>
+              Show all cards
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Progress */}
+            <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${((safeIndex + 1) / deck.length) * 100}%`, background: colors.border, borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+            <div style={{ textAlign: "center", marginBottom: 10, fontSize: 14, color: "#64748b" }}>
+              {safeIndex + 1} / {deck.length}
+              {card && <span style={{ marginLeft: 10, padding: "2px 8px", borderRadius: 12, background: colors.bg, color: colors.text, fontSize: 11, fontWeight: 600 }}>{card.cat}</span>}
+              {card && <span style={{ marginLeft: 8, padding: "2px 8px", borderRadius: 12, background: "#f1f5f9", color: "#64748b", fontSize: 11, fontWeight: 600 }}>{SUBJECT_LABELS[card.subject]}</span>}
+            </div>
+
+            {/* Main card */}
+            <div style={{
+              background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
+              padding: "36px 28px", marginBottom: 16,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+              minHeight: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              position: "relative",
+            }}>
+              {/* Hint watermark */}
+              {showHint && !showAnswer && (
+                <div style={{
+                  position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                  fontSize: 72, fontWeight: 800, color: colors.border, opacity: 0.12,
+                  pointerEvents: "none", whiteSpace: "nowrap", letterSpacing: 4,
+                  userSelect: "none",
+                }}>
+                  {card?.infinitive}
+                </div>
+              )}
+
+              {renderSentence()}
+
+              {/* Hint button */}
+              {!showAnswer && (
+                <button
+                  onClick={() => setShowHint(h => !h)}
+                  style={{
+                    marginTop: 20, padding: "8px 20px", borderRadius: 8,
+                    border: `2px solid ${showHint ? colors.border : "#e2e8f0"}`,
+                    background: showHint ? colors.bg : "#f8fafc",
+                    color: showHint ? colors.text : "#94a3b8",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                  }}
+                >
+                  {showHint ? `Hint: ${card?.infinitive}` : "Show hint (infinitive)"}
+                </button>
+              )}
+
+              {/* Answer section */}
+              {showAnswer && (
+                <div style={{ marginTop: 20, textAlign: "center", width: "100%" }}>
+                  <div style={{
+                    padding: "12px 16px", background: colors.bg, borderRadius: 10,
+                    borderLeft: `4px solid ${colors.border}`,
+                  }}>
+                    <div style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>
+                      {card?.infinitive} ({card?.en.split(" ").slice(0, -1).join(" ") || card?.en})
+                    </div>
+                    <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic" }}>
+                      {card?.en}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reveal answer button */}
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <button
+                onClick={() => setShowAnswer(a => !a)}
+                style={{
+                  padding: "12px 32px", borderRadius: 10,
+                  border: "none",
+                  background: showAnswer ? "#e2e8f0" : colors.border,
+                  color: showAnswer ? "#475569" : "white",
+                  fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+                  boxShadow: showAnswer ? "none" : "0 4px 12px rgba(0,0,0,0.15)",
+                }}
+              >
+                {showAnswer ? "Hide answer" : "Reveal answer"}
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+              <button onClick={prev} disabled={safeIndex === 0}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === 0 ? "#f1f5f9" : "white", color: safeIndex === 0 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === 0 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2190"}</button>
+
+              <button onClick={toggleKnown}
+                style={{
+                  padding: "10px 20px", borderRadius: 10,
+                  border: `2px solid ${known.has(globalIdx) ? "#22c55e" : "#cbd5e1"}`,
+                  background: known.has(globalIdx) ? "#dcfce7" : "white",
+                  color: known.has(globalIdx) ? "#15803d" : "#64748b",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                }}>
+                {known.has(globalIdx) ? "Known" : "Mark as known"}
+              </button>
+
+              <button onClick={next} disabled={safeIndex >= deck.length - 1}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex >= deck.length - 1 ? "#f1f5f9" : "white",
+                  color: safeIndex >= deck.length - 1 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex >= deck.length - 1 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}>{"\u2192"}</button>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: "#94a3b8" }}>
+              Spacebar = reveal &middot; H = hint &middot; Arrow keys = navigate &middot; Swipe on mobile
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FlashCards />);
+</script>
+</body>
+</html>
