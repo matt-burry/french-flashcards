@@ -105,6 +105,19 @@ const CARDS = [
   { sentence: "Elles ___ de Paris en train.", answer: "viennent", infinitive: "venir", en: "They come from Paris by train.", subject: "ils/elles", cat: "Venir" },
 ];
 
+const VERB_DEFS = {
+  "\u00eatre": "to be",
+  "avoir": "to have",
+  "faire": "to do / to make",
+  "aller": "to go",
+  "pouvoir": "to be able to / can",
+  "vouloir": "to want",
+  "devoir": "to have to / must",
+  "savoir": "to know",
+  "dire": "to say / to tell",
+  "venir": "to come",
+};
+
 const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
 
 const CAT_COLORS = {
@@ -216,7 +229,7 @@ function FlashCards() {
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
-            Les Verbes au Pr\u00e9sent
+            Les Verbes au Présent
           </h1>
           <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
             Complete the sentence with the correct conjugation
@@ -337,7 +350,7 @@ function FlashCards() {
                     borderLeft: `4px solid ${colors.border}`,
                   }}>
                     <div style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>
-                      {card?.infinitive} ({card?.en.split(" ").slice(0, -1).join(" ") || card?.en})
+                      {card?.infinitive} — {VERB_DEFS[card?.infinitive]}
                     </div>
                     <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic" }}>
                       {card?.en}
