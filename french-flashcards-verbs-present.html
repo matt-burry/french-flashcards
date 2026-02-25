@@ -135,6 +135,45 @@ const CAT_COLORS = {
 
 const SUBJECT_LABELS = { "je": "je", "tu": "tu", "il/elle": "il / elle / on", "nous": "nous", "vous": "vous", "ils/elles": "ils / elles" };
 
+// Text-to-speech helper — uses browser's built-in French voices
+function speak(text, rate = 0.9) {
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "fr-FR";
+  utter.rate = rate;
+  // Try to pick the best French voice available
+  const voices = window.speechSynthesis.getVoices();
+  const frVoice = voices.find(v => v.lang === "fr-FR" && v.name.includes("Thomas"))
+    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Am\u00e9lie"))
+    || voices.find(v => v.lang === "fr-FR" && !v.name.includes("Google"))
+    || voices.find(v => v.lang.startsWith("fr"));
+  if (frVoice) utter.voice = frVoice;
+  window.speechSynthesis.speak(utter);
+}
+
+// Speaker icon component
+function SpeakerBtn({ text, rate, size = 18, color = "#64748b" }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); speak(text, rate); }}
+      aria-label="Listen"
+      style={{
+        background: "none", border: "none", cursor: "pointer", padding: 4,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        borderRadius: 6, transition: "background 0.2s", verticalAlign: "middle",
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.06)"}
+      onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+    >
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      </svg>
+    </button>
+  );
+}
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -142,6 +181,12 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// Preload voices (some browsers load them asynchronously)
+if (typeof window !== "undefined" && window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 function FlashCards() {
@@ -203,16 +248,24 @@ function FlashCards() {
     return (
       <div style={{ fontSize: 24, color: "#1e293b", lineHeight: 1.6, textAlign: "center", fontWeight: 500 }}>
         {parts[0]}
-        <span style={{
-          display: "inline-block", minWidth: showAnswer ? "auto" : 80,
-          borderBottom: showAnswer ? "none" : "3px solid " + colors.border,
-          padding: "2px 8px", margin: "0 4px",
-          background: showAnswer ? colors.bg : "transparent",
-          borderRadius: showAnswer ? 6 : 0,
-          color: showAnswer ? colors.text : "transparent",
-          fontWeight: 700, fontSize: 26,
-          transition: "all 0.3s",
-        }}>
+        <span
+          onClick={showAnswer ? (e) => { e.stopPropagation(); speak(card.answer, 0.75); } : undefined}
+          style={{
+            display: "inline-block", minWidth: showAnswer ? "auto" : 80,
+            borderBottom: showAnswer ? "none" : "3px solid " + colors.border,
+            padding: "2px 8px", margin: "0 4px",
+            background: showAnswer ? colors.bg : "transparent",
+            borderRadius: showAnswer ? 6 : 0,
+            color: showAnswer ? colors.text : "transparent",
+            fontWeight: 700, fontSize: 26,
+            transition: "all 0.3s",
+            cursor: showAnswer ? "pointer" : "default",
+            textDecoration: showAnswer ? "underline dotted" : "none",
+            textDecorationColor: showAnswer ? colors.border : "transparent",
+            textUnderlineOffset: 4,
+          }}
+          title={showAnswer ? "Click to hear pronunciation" : ""}
+        >
           {showAnswer ? card.answer : "\u00a0"}
         </span>
         {parts[1]}
@@ -345,6 +398,11 @@ function FlashCards() {
               {/* Answer section */}
               {showAnswer && (
                 <div style={{ marginTop: 20, textAlign: "center", width: "100%" }}>
+                  {/* Listen to full sentence */}
+                  <div style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <SpeakerBtn text={card?.sentence.replace("___", card?.answer)} rate={0.85} size={20} color={colors.text} />
+                    <span style={{ fontSize: 13, color: "#94a3b8" }}>Listen to full sentence</span>
+                  </div>
                   <div style={{
                     padding: "12px 16px", background: colors.bg, borderRadius: 10,
                     borderLeft: `4px solid ${colors.border}`,
