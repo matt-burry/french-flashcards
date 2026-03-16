@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Les Courses">
+<meta name="apple-mobile-web-app-title" content="Cuisine">
 <meta name="theme-color" content="#f8fafc">
-<title>Les Courses et la Cuisine — French Flash Cards</title>
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJzZXJpZiI+RnI8L3RleHQ+PC9zdmc+">
+<title>Cuisiner à la Maison — French Cooking Flash Cards</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
@@ -23,95 +22,91 @@
 const { useState, useMemo, useCallback, useEffect } = React;
 
 const CARDS = [
-  { fr: "une pomme", en: "an apple", ex: "Je mange une pomme verte chaque jour.", exEn: "I eat a green apple every day.", cat: "Fruits & Vegetables" },
-  { fr: "une banane", en: "a banana", ex: "Les bananes sont riches en potassium.", exEn: "Bananas are rich in potassium.", cat: "Fruits & Vegetables" },
-  { fr: "une orange", en: "an orange", ex: "Je pr\u00e9f\u00e8re les oranges sucr\u00e9es.", exEn: "I prefer sweet oranges.", cat: "Fruits & Vegetables" },
-  { fr: "une carotte", en: "a carrot", ex: "Ajoute des carottes dans la soupe.", exEn: "Add carrots to the soup.", cat: "Fruits & Vegetables" },
-  { fr: "un oignon", en: "an onion", ex: "Les oignons font pleurer quand on les coupe.", exEn: "Onions make you cry when you cut them.", cat: "Fruits & Vegetables" },
-  { fr: "l'ail (m)", en: "garlic", ex: "Je mets toujours de l'ail dans mes plats.", exEn: "I always put garlic in my dishes.", cat: "Fruits & Vegetables" },
-  { fr: "une tomate", en: "a tomato", ex: "Les tomates du march\u00e9 sont excellentes.", exEn: "The tomatoes from the market are excellent.", cat: "Fruits & Vegetables" },
-  { fr: "une laitue", en: "lettuce", ex: "La laitue verte est cr\u00e9meuse.", exEn: "Green lettuce is creamy.", cat: "Fruits & Vegetables" },
-  { fr: "une pomme de terre", en: "a potato", ex: "Je pr\u00e9f\u00e8re les pommes de terre r\u00f4ties.", exEn: "I prefer roasted potatoes.", cat: "Fruits & Vegetables" },
-  { fr: "des \u00e9pinards", en: "spinach", ex: "Les \u00e9pinards sont tr\u00e8s bons pour la sant\u00e9.", exEn: "Spinach is very good for your health.", cat: "Fruits & Vegetables" },
+  // Viandes et protéines
+  { fr: "le poulet", en: "chicken", ex: "Je fais r\u00f4tir le poulet avec des herbes de Provence.", exEn: "I roast the chicken with herbs de Provence.", cat: "Meat & Protein" },
+  { fr: "le b\u0153uf", en: "beef", ex: "Le b\u0153uf bourguignon mijote pendant trois heures.", exEn: "The beef bourguignon simmers for three hours.", cat: "Meat & Protein" },
+  { fr: "le porc", en: "pork", ex: "On fait des c\u00f4tes de porc au barbecue ce soir.", exEn: "We're grilling pork chops on the barbecue tonight.", cat: "Meat & Protein" },
+  { fr: "le poisson", en: "fish", ex: "Le poisson est meilleur quand il est tr\u00e8s frais.", exEn: "Fish is best when it's very fresh.", cat: "Meat & Protein" },
+  { fr: "les crevettes", en: "shrimp", ex: "Je fais sauter les crevettes avec de l'ail.", exEn: "I saut\u00e9 the shrimp with garlic.", cat: "Meat & Protein" },
+  { fr: "un \u0153uf", en: "an egg", ex: "Il faut casser les \u0153ufs dans un bol s\u00e9par\u00e9.", exEn: "You need to crack the eggs into a separate bowl.", cat: "Meat & Protein" },
+  { fr: "le lard / le bacon", en: "bacon", ex: "Fais rissoler le lard avant d'ajouter les oignons.", exEn: "Brown the bacon before adding the onions.", cat: "Meat & Protein" },
 
-  { fr: "le poulet", en: "chicken", ex: "Je fais cuire le poulet au four.", exEn: "I roast the chicken in the oven.", cat: "Meat & Seafood" },
-  { fr: "le b\u0153uf", en: "beef", ex: "Ce r\u00f4ti de b\u0153uf est d\u00e9licieux.", exEn: "This beef roast is delicious.", cat: "Meat & Seafood" },
-  { fr: "le porc", en: "pork", ex: "Les c\u00f4telettes de porc sont tendres.", exEn: "Pork chops are tender.", cat: "Meat & Seafood" },
-  { fr: "le poisson", en: "fish", ex: "Je cuisine du poisson deux fois par semaine.", exEn: "I cook fish twice a week.", cat: "Meat & Seafood" },
-  { fr: "les crevettes (f)", en: "shrimp", ex: "Les crevettes sont excellentes avec de l'ail.", exEn: "Shrimp is excellent with garlic.", cat: "Meat & Seafood" },
-  { fr: "le saumon", en: "salmon", ex: "Le saumon grill\u00e9 est savoureux.", exEn: "Grilled salmon is delicious.", cat: "Meat & Seafood" },
-  { fr: "les mo\u00fcles (f)", en: "mussels", ex: "Les mo\u00fcles \u00e0 la cr\u00e8me sont un d\u00e9lice.", exEn: "Creamy mussels are a delight.", cat: "Meat & Seafood" },
-  { fr: "le jambon", en: "ham", ex: "Je prends du jambon pour le sandwich.", exEn: "I take ham for the sandwich.", cat: "Meat & Seafood" },
+  // Légumes et herbes
+  { fr: "un oignon", en: "an onion", ex: "Fais revenir l'oignon jusqu'\u00e0 ce qu'il soit translucide.", exEn: "Cook the onion until it becomes translucent.", cat: "Vegetables & Herbs" },
+  { fr: "l'ail", en: "garlic", ex: "Ajoute l'ail \u00e9minc\u00e9 et fais-le revenir une minute.", exEn: "Add the minced garlic and cook it for one minute.", cat: "Vegetables & Herbs" },
+  { fr: "une carotte", en: "a carrot", ex: "Coupe les carottes en rondelles fines.", exEn: "Cut the carrots into thin rounds.", cat: "Vegetables & Herbs" },
+  { fr: "une pomme de terre", en: "a potato", ex: "\u00c9pluche les pommes de terre et coupe-les en d\u00e9s.", exEn: "Peel the potatoes and cut them into cubes.", cat: "Vegetables & Herbs" },
+  { fr: "une tomate", en: "a tomato", ex: "Enl\u00e8ve les graines des tomates avant de les couper.", exEn: "Remove the seeds from the tomatoes before cutting them.", cat: "Vegetables & Herbs" },
+  { fr: "le persil", en: "parsley", ex: "Ajoute du persil frais juste avant de servir.", exEn: "Add fresh parsley just before serving.", cat: "Vegetables & Herbs" },
+  { fr: "le thym", en: "thyme", ex: "Le thym va tr\u00e8s bien avec le poulet r\u00f4ti.", exEn: "Thyme goes very well with roast chicken.", cat: "Vegetables & Herbs" },
+  { fr: "le basilic", en: "basil", ex: "D\u00e9chire le basilic \u00e0 la main plut\u00f4t que de le couper.", exEn: "Tear the basil by hand rather than cutting it.", cat: "Vegetables & Herbs" },
 
-  { fr: "le lait", en: "milk", ex: "Je bois un verre de lait le matin.", exEn: "I drink a glass of milk in the morning.", cat: "Dairy & Bakery" },
-  { fr: "le fromage", en: "cheese", ex: "La France produit d'excellents fromages.", exEn: "France produces excellent cheeses.", cat: "Dairy & Bakery" },
-  { fr: "le beurre", en: "butter", ex: "Ajoute du beurre dans la po\u00eal\u00e9.", exEn: "Add butter to the pan.", cat: "Dairy & Bakery" },
-  { fr: "les \u0153ufs (m)", en: "eggs", ex: "Je pr\u00e9pare des \u0153ufs brouill\u00e9s.", exEn: "I prepare scrambled eggs.", cat: "Dairy & Bakery" },
-  { fr: "la cr\u00e8me fra\u00eeche", en: "sour cream", ex: "La cr\u00e8me fra\u00eeche rend les sauces cr\u00e9meuses.", exEn: "Sour cream makes sauces creamy.", cat: "Dairy & Bakery" },
-  { fr: "le yaourt", en: "yogurt", ex: "Je mange du yaourt grec au petit d\u00e9jeuner.", exEn: "I eat Greek yogurt for breakfast.", cat: "Dairy & Bakery" },
-  { fr: "la baguette", en: "a baguette", ex: "J'ach\u00e8te une baguette fra\u00eeche chaque jour.", exEn: "I buy a fresh baguette every day.", cat: "Dairy & Bakery" },
-  { fr: "un croissant", en: "a croissant", ex: "Les croissants sont croustillants le matin.", exEn: "Croissants are crispy in the morning.", cat: "Dairy & Bakery" },
-  { fr: "le pain complet", en: "wholemeal bread", ex: "Le pain complet est plus nutritif.", exEn: "Wholemeal bread is more nutritious.", cat: "Dairy & Bakery" },
+  // Ingrédients de base
+  { fr: "la farine", en: "flour", ex: "Tamise la farine pour \u00e9viter les grumeaux.", exEn: "Sift the flour to avoid lumps.", cat: "Pantry Basics" },
+  { fr: "le beurre", en: "butter", ex: "Fais fondre le beurre \u00e0 feu doux dans la casserole.", exEn: "Melt the butter over low heat in the saucepan.", cat: "Pantry Basics" },
+  { fr: "l'huile d'olive", en: "olive oil", ex: "Verse un filet d'huile d'olive dans la po\u00eale.", exEn: "Pour a drizzle of olive oil into the pan.", cat: "Pantry Basics" },
+  { fr: "le sel", en: "salt", ex: "Assaisonne avec du sel et du poivre selon ton go\u00fbt.", exEn: "Season with salt and pepper to your taste.", cat: "Pantry Basics" },
+  { fr: "le poivre", en: "pepper", ex: "Donne quelques tours de moulin \u00e0 poivre.", exEn: "Give a few turns of the pepper mill.", cat: "Pantry Basics" },
+  { fr: "le sucre", en: "sugar", ex: "Ajoute une cuill\u00e8re \u00e0 soupe de sucre dans la p\u00e2te.", exEn: "Add a tablespoon of sugar to the batter.", cat: "Pantry Basics" },
+  { fr: "la cr\u00e8me fra\u00eeche", en: "cr\u00e8me fra\u00eeche / sour cream", ex: "Incorpore la cr\u00e8me fra\u00eeche en fin de cuisson.", exEn: "Stir in the cr\u00e8me fra\u00eeche at the end of cooking.", cat: "Pantry Basics" },
+  { fr: "le bouillon", en: "broth / stock", ex: "Ajoute le bouillon de poulet petit \u00e0 petit.", exEn: "Add the chicken broth little by little.", cat: "Pantry Basics" },
 
-  { fr: "la farine", en: "flour", ex: "J'ai besoin de farine pour les cr\u00eapes.", exEn: "I need flour for crepes.", cat: "Pantry Staples" },
-  { fr: "le sucre", en: "sugar", ex: "Je mets du sucre dans mon caf\u00e9.", exEn: "I put sugar in my coffee.", cat: "Pantry Staples" },
-  { fr: "l'huile (f)", en: "oil", ex: "L'huile d'olive est bonne pour la sant\u00e9.", exEn: "Olive oil is good for your health.", cat: "Pantry Staples" },
-  { fr: "le sel", en: "salt", ex: "N'oublie pas le sel dans l'eau de cuisson.", exEn: "Don't forget the salt in the cooking water.", cat: "Pantry Staples" },
-  { fr: "le poivre", en: "pepper", ex: "Assaisonne avec du sel et du poivre.", exEn: "Season with salt and pepper.", cat: "Pantry Staples" },
-  { fr: "le riz", en: "rice", ex: "Je pr\u00e9f\u00e8re le riz blanc.", exEn: "I prefer white rice.", cat: "Pantry Staples" },
-  { fr: "les p\u00e2tes (f)", en: "pasta", ex: "Les p\u00e2tes \u00e0 la carbonara sont italienne.", exEn: "Pasta carbonara is Italian.", cat: "Pantry Staples" },
-  { fr: "le vinaigre", en: "vinegar", ex: "Ajoute un peu de vinaigre pour le go\u00fbt.", exEn: "Add a little vinegar for taste.", cat: "Pantry Staples" },
-  { fr: "la moutarde", en: "mustard", ex: "Je mets de la moutarde sur mon sandwich.", exEn: "I put mustard on my sandwich.", cat: "Pantry Staples" },
-  { fr: "le miel", en: "honey", ex: "Le miel rend le th\u00e9 plus doux.", exEn: "Honey makes tea sweeter.", cat: "Pantry Staples" },
+  // Ustensiles de cuisine
+  { fr: "une casserole", en: "a saucepan", ex: "Fais chauffer l'eau dans une grande casserole.", exEn: "Heat the water in a large saucepan.", cat: "Kitchen Tools" },
+  { fr: "une po\u00eale", en: "a frying pan / skillet", ex: "Fais chauffer la po\u00eale avant d'ajouter l'huile.", exEn: "Heat up the pan before adding the oil.", cat: "Kitchen Tools" },
+  { fr: "un couteau", en: "a knife", ex: "Utilise un couteau bien aiguisé pour \u00e9mincer.", exEn: "Use a sharp knife for slicing.", cat: "Kitchen Tools" },
+  { fr: "une planche \u00e0 d\u00e9couper", en: "a cutting board", ex: "Pose les l\u00e9gumes sur la planche \u00e0 d\u00e9couper.", exEn: "Place the vegetables on the cutting board.", cat: "Kitchen Tools" },
+  { fr: "un fouet", en: "a whisk", ex: "Bats les \u0153ufs avec un fouet jusqu'\u00e0 ce qu'ils soient mousseux.", exEn: "Beat the eggs with a whisk until they're frothy.", cat: "Kitchen Tools" },
+  { fr: "une spatule", en: "a spatula", ex: "Retourne les cr\u00eapes avec une spatule.", exEn: "Flip the cr\u00eapes with a spatula.", cat: "Kitchen Tools" },
+  { fr: "une passoire", en: "a colander / strainer", ex: "\u00c9goutte les p\u00e2tes dans la passoire.", exEn: "Drain the pasta in the colander.", cat: "Kitchen Tools" },
+  { fr: "un saladier", en: "a mixing bowl", ex: "M\u00e9lange tous les ingr\u00e9dients dans un grand saladier.", exEn: "Mix all the ingredients in a large bowl.", cat: "Kitchen Tools" },
+  { fr: "le four", en: "the oven", ex: "Pr\u00e9chauffe le four \u00e0 cent quatre-vingts degr\u00e9s.", exEn: "Preheat the oven to one hundred eighty degrees.", cat: "Kitchen Tools" },
+  { fr: "une cuill\u00e8re en bois", en: "a wooden spoon", ex: "Remue la sauce avec une cuill\u00e8re en bois.", exEn: "Stir the sauce with a wooden spoon.", cat: "Kitchen Tools" },
 
-  { fr: "le rayon", en: "the aisle / shelf", ex: "Le rayon des fruits est au fond du magasin.", exEn: "The fruit aisle is at the back of the store.", cat: "At the Store" },
-  { fr: "le prix", en: "the price", ex: "Quel est le prix de ce fromage ?", exEn: "What is the price of this cheese?", cat: "At the Store" },
-  { fr: "une promotion", en: "a sale / promotion", ex: "Il y a une promotion sur les yaourts.", exEn: "There's a sale on yogurts.", cat: "At the Store" },
-  { fr: "peser", en: "to weigh", ex: "Je dois peser les pommes.", exEn: "I need to weigh the apples.", cat: "At the Store" },
-  { fr: "un chariot", en: "a shopping cart", ex: "Prends un chariot, on achète beaucoup.", exEn: "Get a cart, we're buying a lot.", cat: "At the Store" },
-  { fr: "une liste de courses", en: "a shopping list", ex: "J'ai \u00e9crit une liste avant d'aller au supermarch\u00e9.", exEn: "I wrote a list before going to the supermarket.", cat: "At the Store" },
-  { fr: "la caisse", en: "the checkout", ex: "Il y a une queue \u00e0 la caisse.", exEn: "There's a line at the checkout.", cat: "At the Store" },
-  { fr: "payer", en: "to pay", ex: "Tu peux payer par carte de cr\u00e9dit.", exEn: "You can pay by credit card.", cat: "At the Store" },
+  // Verbes de cuisine
+  { fr: "couper", en: "to cut / chop", ex: "Coupe les l\u00e9gumes en petits morceaux.", exEn: "Cut the vegetables into small pieces.", cat: "Cooking Verbs" },
+  { fr: "\u00e9mincer", en: "to slice thinly / mince", ex: "\u00c9mince l'oignon le plus finement possible.", exEn: "Slice the onion as finely as possible.", cat: "Cooking Verbs" },
+  { fr: "\u00e9plucher", en: "to peel", ex: "\u00c9pluche les pommes avant de les mettre dans la tarte.", exEn: "Peel the apples before putting them in the pie.", cat: "Cooking Verbs" },
+  { fr: "m\u00e9langer", en: "to mix / stir", ex: "M\u00e9lange la farine et les \u0153ufs jusqu'\u00e0 obtenir une p\u00e2te lisse.", exEn: "Mix the flour and eggs until you get a smooth batter.", cat: "Cooking Verbs" },
+  { fr: "faire revenir", en: "to saut\u00e9 / brown", ex: "Fais revenir les oignons dans un peu de beurre.", exEn: "Saut\u00e9 the onions in a little butter.", cat: "Cooking Verbs" },
+  { fr: "faire bouillir", en: "to boil", ex: "Fais bouillir l'eau avant d'ajouter les p\u00e2tes.", exEn: "Boil the water before adding the pasta.", cat: "Cooking Verbs" },
+  { fr: "mijoter", en: "to simmer", ex: "Laisse mijoter \u00e0 feu doux pendant une heure.", exEn: "Let it simmer on low heat for an hour.", cat: "Cooking Verbs" },
+  { fr: "r\u00f4tir", en: "to roast", ex: "On va r\u00f4tir le poulet au four avec des pommes de terre.", exEn: "We're going to roast the chicken in the oven with potatoes.", cat: "Cooking Verbs" },
+  { fr: "gratiner", en: "to bake until golden / gratin", ex: "Fais gratiner le dessus au four pendant dix minutes.", exEn: "Bake the top in the oven for ten minutes until golden.", cat: "Cooking Verbs" },
+  { fr: "assaisonner", en: "to season", ex: "N'oublie pas d'assaisonner avant de servir.", exEn: "Don't forget to season before serving.", cat: "Cooking Verbs" },
+  { fr: "verser", en: "to pour", ex: "Verse la sauce sur les p\u00e2tes et m\u00e9lange bien.", exEn: "Pour the sauce over the pasta and mix well.", cat: "Cooking Verbs" },
+  { fr: "go\u00fcter", en: "to taste", ex: "Go\u00fbte la soupe et ajuste le sel si n\u00e9cessaire.", exEn: "Taste the soup and adjust the salt if needed.", cat: "Cooking Verbs" },
 
-  { fr: "une casserole", en: "a pot / saucepan", ex: "Je fais bouillir l'eau dans une casserole.", exEn: "I boil water in a pot.", cat: "Kitchen Tools" },
-  { fr: "une po\u00eal\u00e9", en: "a frying pan", ex: "Fais sauter les l\u00e9gumes dans la po\u00eal\u00e9.", exEn: "Saute the vegetables in the frying pan.", cat: "Kitchen Tools" },
-  { fr: "un couteau", en: "a knife", ex: "Je dois a\u00e9guiser mon couteau.", exEn: "I need to sharpen my knife.", cat: "Kitchen Tools" },
-  { fr: "une planche \u00e0 d\u00e9couper", en: "a cutting board", ex: "Coupe les l\u00e9gumes sur la planche.", exEn: "Cut the vegetables on the cutting board.", cat: "Kitchen Tools" },
-  { fr: "un four", en: "an oven", ex: "Mets le poulet au four \u00e0 200 degr\u00e9s.", exEn: "Put the chicken in the oven at 200 degrees.", cat: "Kitchen Tools" },
-  { fr: "une cuiller", en: "a spoon", ex: "Utilise une cuiller en bois pour m\u00e9langer.", exEn: "Use a wooden spoon to mix.", cat: "Kitchen Tools" },
-  { fr: "une fourchette", en: "a fork", ex: "Pique la viande avec une fourchette.", exEn: "Pierce the meat with a fork.", cat: "Kitchen Tools" },
-  { fr: "un \u00e9plucheur", en: "a peeler", ex: "Utilise l'\u00e9plucheur pour les pommes de terre.", exEn: "Use the peeler for potatoes.", cat: "Kitchen Tools" },
+  // Termes de recette
+  { fr: "une recette", en: "a recipe", ex: "J'ai trouv\u00e9 une nouvelle recette de gratin dauphinois.", exEn: "I found a new recipe for potatoes au gratin.", cat: "Recipe Terms" },
+  { fr: "une cuill\u00e8re \u00e0 soupe", en: "a tablespoon", ex: "Ajoute deux cuill\u00e8res \u00e0 soupe de cr\u00e8me.", exEn: "Add two tablespoons of cream.", cat: "Recipe Terms" },
+  { fr: "une cuill\u00e8re \u00e0 caf\u00e9", en: "a teaspoon", ex: "Mets une cuill\u00e8re \u00e0 caf\u00e9 de vanille.", exEn: "Add a teaspoon of vanilla.", cat: "Recipe Terms" },
+  { fr: "une pinc\u00e9e", en: "a pinch", ex: "Ajoute une pinc\u00e9e de sel dans la p\u00e2te.", exEn: "Add a pinch of salt to the batter.", cat: "Recipe Terms" },
+  { fr: "un filet", en: "a drizzle / splash", ex: "Termine avec un filet de jus de citron.", exEn: "Finish with a drizzle of lemon juice.", cat: "Recipe Terms" },
+  { fr: "\u00e0 feu doux", en: "on low heat", ex: "Laisse cuire \u00e0 feu doux pendant vingt minutes.", exEn: "Let it cook on low heat for twenty minutes.", cat: "Recipe Terms" },
+  { fr: "\u00e0 feu vif", en: "on high heat", ex: "Fais saisir la viande \u00e0 feu vif.", exEn: "Sear the meat on high heat.", cat: "Recipe Terms" },
+  { fr: "laisser reposer", en: "to let rest", ex: "Laisse reposer la p\u00e2te au frigo pendant une heure.", exEn: "Let the dough rest in the fridge for an hour.", cat: "Recipe Terms" },
 
-  { fr: "couper", en: "to cut", ex: "Coupe les oignons finement.", exEn: "Cut the onions finely.", cat: "Cooking Verbs" },
-  { fr: "m\u00e9langer", en: "to mix", ex: "M\u00e9lange les ingr\u00e9dients dans un bol.", exEn: "Mix the ingredients in a bowl.", cat: "Cooking Verbs" },
-  { fr: "faire bouillir", en: "to boil", ex: "Fais bouillir l'eau pour les p\u00e2tes.", exEn: "Boil the water for pasta.", cat: "Cooking Verbs" },
-  { fr: "\u00e9plucher", en: "to peel", ex: "\u00c9pluche les carottes avant de les cuire.", exEn: "Peel the carrots before cooking them.", cat: "Cooking Verbs" },
-  { fr: "assaisonner", en: "to season", ex: "Assaisonne le plat avec du sel et du poivre.", exEn: "Season the dish with salt and pepper.", cat: "Cooking Verbs" },
-  { fr: "faire sauter", en: "to saute", ex: "Fais sauter les champignons dans le beurre.", exEn: "Saute the mushrooms in butter.", cat: "Cooking Verbs" },
-  { fr: "faire cuire", en: "to cook", ex: "Fais cuire le poulet pendant 45 minutes.", exEn: "Cook the chicken for 45 minutes.", cat: "Cooking Verbs" },
-  { fr: "r\u00f4tir", en: "to roast", ex: "R\u00f4tis les l\u00e9gumes au four.", exEn: "Roast the vegetables in the oven.", cat: "Cooking Verbs" },
-  { fr: "mijoter", en: "to simmer", ex: "Laisse mijoter la sauce 20 minutes.", exEn: "Let the sauce simmer for 20 minutes.", cat: "Cooking Verbs" },
-  { fr: "go\u00fbter", en: "to taste", ex: "Go\u00fbte la soupe et ajoute du sel.", exEn: "Taste the soup and add salt.", cat: "Cooking Verbs" },
-
-  { fr: "une recette", en: "a recipe", ex: "J'aime suivre des recettes sur Internet.", exEn: "I like to follow recipes online.", cat: "Recipes & Taste" },
-  { fr: "sal\u00e9", en: "salty", ex: "Cette sauce est trop sal\u00e9e.", exEn: "This sauce is too salty.", cat: "Recipes & Taste" },
-  { fr: "sucr\u00e9", en: "sweet", ex: "Les desserts sont sucr\u00e9s.", exEn: "Desserts are sweet.", cat: "Recipes & Taste" },
-  { fr: "\u00e9pic\u00e9", en: "spicy", ex: "Ce curry est tr\u00e8s \u00e9pic\u00e9.", exEn: "This curry is very spicy.", cat: "Recipes & Taste" },
-  { fr: "d\u00e9licieux", en: "delicious", ex: "Le repas \u00e9tait d\u00e9licieux.", exEn: "The meal was delicious.", cat: "Recipes & Taste" },
-  { fr: "l\u00e9ger", en: "light", ex: "Je veux un repas l\u00e9ger ce soir.", exEn: "I want a light meal tonight.", cat: "Recipes & Taste" },
+  // Goûts et textures
+  { fr: "sal\u00e9", en: "salty", ex: "C'est un peu trop sal\u00e9, ajoute de l'eau.", exEn: "It's a bit too salty, add some water.", cat: "Taste & Texture" },
+  { fr: "sucr\u00e9", en: "sweet", ex: "Ce dessert est sucr\u00e9 mais pas \u00e9c\u0153urant.", exEn: "This dessert is sweet but not sickly.", cat: "Taste & Texture" },
+  { fr: "\u00e9pic\u00e9", en: "spicy", ex: "Si tu aimes les plats \u00e9pic\u00e9s, ajoute du piment.", exEn: "If you like spicy dishes, add some chili.", cat: "Taste & Texture" },
+  { fr: "croustillant", en: "crispy / crunchy", ex: "Le poulet est bien croustillant \u00e0 l'ext\u00e9rieur.", exEn: "The chicken is nicely crispy on the outside.", cat: "Taste & Texture" },
+  { fr: "moelleux", en: "soft / moist (cake)", ex: "Ce g\u00e2teau au chocolat est incroyablement moelleux.", exEn: "This chocolate cake is incredibly moist.", cat: "Taste & Texture" },
+  { fr: "fondant", en: "melt-in-your-mouth", ex: "La viande est fondante apr\u00e8s trois heures de cuisson.", exEn: "The meat is melt-in-your-mouth after three hours of cooking.", cat: "Taste & Texture" },
+  { fr: "d\u00e9licieux", en: "delicious", ex: "C'est vraiment d\u00e9licieux, tu peux me donner la recette ?", exEn: "It's really delicious, can you give me the recipe?", cat: "Taste & Texture" },
 ];
 
 const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
 
 const CAT_COLORS = {
-  "Fruits & Vegetables": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
-  "Meat & Seafood": { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
-  "Dairy & Bakery": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
-  "Pantry Staples": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
-  "At the Store": { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
-  "Kitchen Tools": { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)", text: "rgb(67, 56, 202)" },
-  "Cooking Verbs": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
-  "Recipes & Taste": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+  "Meat & Protein":     { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)",  text: "rgb(185, 28, 28)" },
+  "Vegetables & Herbs": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)",   text: "rgb(21, 128, 61)" },
+  "Pantry Basics":      { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Kitchen Tools":      { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)",  text: "rgb(29, 78, 216)" },
+  "Cooking Verbs":      { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)",  text: "rgb(126, 34, 206)" },
+  "Recipe Terms":       { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)",  text: "rgb(194, 65, 12)" },
+  "Taste & Texture":    { bg: "rgb(252, 231, 243)", border: "rgb(236, 72, 153)",  text: "rgb(190, 24, 93)" },
 };
 
 // Text-to-speech
@@ -122,7 +117,7 @@ function speak(text, rate = 0.9) {
   utter.rate = rate;
   const voices = window.speechSynthesis.getVoices();
   const frVoice = voices.find(v => v.lang === "fr-FR" && v.name.includes("Thomas"))
-    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Amélie"))
+    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Am\u00e9lie"))
     || voices.find(v => v.lang === "fr-FR" && !v.name.includes("Google"))
     || voices.find(v => v.lang.startsWith("fr"));
   if (frVoice) utter.voice = frVoice;
@@ -176,10 +171,7 @@ function FlashCards() {
 
   const deck = useMemo(() => {
     let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
-    if (hideKnown) cards = cards.filter((_, i) => {
-      const globalIdx = CARDS.indexOf(cards === CARDS ? CARDS[i] : cards[i]);
-      return !known.has(globalIdx);
-    });
+    if (hideKnown) cards = cards.filter(c => !known.has(CARDS.indexOf(c)));
     return shuffled ? shuffle(cards) : cards;
   }, [activeCat, shuffled, hideKnown, known]);
 
@@ -198,7 +190,7 @@ function FlashCards() {
     });
   }, [globalIdx]);
 
-  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Fruits & Vegetables"];
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Meat & Protein"];
 
   useEffect(() => {
     const handler = (e) => {
@@ -210,7 +202,6 @@ function FlashCards() {
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
 
-  // Swipe support for mobile
   const [touchStart, setTouchStart] = useState(null);
   const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
   const handleTouchEnd = (e) => {
@@ -225,10 +216,10 @@ function FlashCards() {
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
-            Les Courses et la Cuisine
+            Cuisiner à la Maison
           </h1>
           <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
-            {CARDS.length} words &amp; phrases for shopping and cooking in French
+            {CARDS.length} words &amp; phrases for cooking at home in French
           </p>
         </div>
 
@@ -302,7 +293,7 @@ function FlashCards() {
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               style={{
-                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 320,
+                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 340,
                 userSelect: "none", WebkitTapHighlightColor: "transparent",
               }}
             >
@@ -311,6 +302,7 @@ function FlashCards() {
                 transformStyle: "preserve-3d", transition: "transform 0.5s",
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
               }}>
+                {/* Front */}
                 <div style={{
                   position: "absolute", inset: 0, backfaceVisibility: "hidden",
                   background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
@@ -327,6 +319,7 @@ function FlashCards() {
                     Tap to reveal
                   </div>
                 </div>
+                {/* Back */}
                 <div style={{
                   position: "absolute", inset: 0, backfaceVisibility: "hidden",
                   transform: "rotateY(180deg)",
@@ -342,7 +335,7 @@ function FlashCards() {
                   <div
                     onClick={(e) => { e.stopPropagation(); setShowTranslation(s => !s); }}
                     style={{
-                      marginTop: 20, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
+                      marginTop: 18, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
                       borderRadius: 10, borderLeft: `4px solid ${colors.border}`, width: "100%", maxWidth: 400,
                       cursor: "pointer", position: "relative", transition: "background 0.2s",
                     }}

@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Les Courses">
+<meta name="apple-mobile-web-app-title" content="Restaurant">
 <meta name="theme-color" content="#f8fafc">
-<title>Les Courses et la Cuisine — French Flash Cards</title>
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJzZXJpZiI+RnI8L3RleHQ+PC9zdmc+">
+<title>Au Restaurant — French Dining Flash Cards</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
@@ -23,95 +22,99 @@
 const { useState, useMemo, useCallback, useEffect } = React;
 
 const CARDS = [
-  { fr: "une pomme", en: "an apple", ex: "Je mange une pomme verte chaque jour.", exEn: "I eat a green apple every day.", cat: "Fruits & Vegetables" },
-  { fr: "une banane", en: "a banana", ex: "Les bananes sont riches en potassium.", exEn: "Bananas are rich in potassium.", cat: "Fruits & Vegetables" },
-  { fr: "une orange", en: "an orange", ex: "Je pr\u00e9f\u00e8re les oranges sucr\u00e9es.", exEn: "I prefer sweet oranges.", cat: "Fruits & Vegetables" },
-  { fr: "une carotte", en: "a carrot", ex: "Ajoute des carottes dans la soupe.", exEn: "Add carrots to the soup.", cat: "Fruits & Vegetables" },
-  { fr: "un oignon", en: "an onion", ex: "Les oignons font pleurer quand on les coupe.", exEn: "Onions make you cry when you cut them.", cat: "Fruits & Vegetables" },
-  { fr: "l'ail (m)", en: "garlic", ex: "Je mets toujours de l'ail dans mes plats.", exEn: "I always put garlic in my dishes.", cat: "Fruits & Vegetables" },
-  { fr: "une tomate", en: "a tomato", ex: "Les tomates du march\u00e9 sont excellentes.", exEn: "The tomatoes from the market are excellent.", cat: "Fruits & Vegetables" },
-  { fr: "une laitue", en: "lettuce", ex: "La laitue verte est cr\u00e9meuse.", exEn: "Green lettuce is creamy.", cat: "Fruits & Vegetables" },
-  { fr: "une pomme de terre", en: "a potato", ex: "Je pr\u00e9f\u00e8re les pommes de terre r\u00f4ties.", exEn: "I prefer roasted potatoes.", cat: "Fruits & Vegetables" },
-  { fr: "des \u00e9pinards", en: "spinach", ex: "Les \u00e9pinards sont tr\u00e8s bons pour la sant\u00e9.", exEn: "Spinach is very good for your health.", cat: "Fruits & Vegetables" },
+  // Arriving & Reservations
+  { fr: "r\u00e9server", en: "to reserve / book", ex: "Je veux r\u00e9server une table pour deux personnes demain soir.", exEn: "I want to reserve a table for two people tomorrow evening.", cat: "Arriving & Reservations" },
+  { fr: "une table", en: "a table", ex: "Avez-vous une table prs de la fen\u00eatre ?", exEn: "Do you have a table by the window?", cat: "Arriving & Reservations" },
+  { fr: "une r\u00e9servation", en: "a reservation", ex: "Nous avons une r\u00e9servation sous le nom de Martin.", exEn: "We have a reservation under the name Martin.", cat: "Arriving & Reservations" },
+  { fr: "la terrasse", en: "the terrace / patio", ex: "Je pr\u00e9f\u00e9rerais une table sur la terrasse s'il y en a une.", exEn: "I would prefer a table on the terrace if there is one.", cat: "Arriving & Reservations" },
+  { fr: "l'intrieur", en: "the interior", ex: "Nous prfrons l'intrieur car il fait trop froid dehors.", exEn: "We prefer the interior because it's too cold outside.", cat: "Arriving & Reservations" },
+  { fr: "pour combien de personnes ?", en: "for how many people?", ex: "Bonjour, une table pour combien de personnes ?", exEn: "Hello, a table for how many people?", cat: "Arriving & Reservations" },
+  { fr: "l'accueil / le gu\u00e9richet", en: "the reception / front desk", ex: "S'il vous pla\u00eet, passez par l'accueil pour vous enregistrer.", exEn: "Please go to reception to check in.", cat: "Arriving & Reservations" },
 
-  { fr: "le poulet", en: "chicken", ex: "Je fais cuire le poulet au four.", exEn: "I roast the chicken in the oven.", cat: "Meat & Seafood" },
-  { fr: "le b\u0153uf", en: "beef", ex: "Ce r\u00f4ti de b\u0153uf est d\u00e9licieux.", exEn: "This beef roast is delicious.", cat: "Meat & Seafood" },
-  { fr: "le porc", en: "pork", ex: "Les c\u00f4telettes de porc sont tendres.", exEn: "Pork chops are tender.", cat: "Meat & Seafood" },
-  { fr: "le poisson", en: "fish", ex: "Je cuisine du poisson deux fois par semaine.", exEn: "I cook fish twice a week.", cat: "Meat & Seafood" },
-  { fr: "les crevettes (f)", en: "shrimp", ex: "Les crevettes sont excellentes avec de l'ail.", exEn: "Shrimp is excellent with garlic.", cat: "Meat & Seafood" },
-  { fr: "le saumon", en: "salmon", ex: "Le saumon grill\u00e9 est savoureux.", exEn: "Grilled salmon is delicious.", cat: "Meat & Seafood" },
-  { fr: "les mo\u00fcles (f)", en: "mussels", ex: "Les mo\u00fcles \u00e0 la cr\u00e8me sont un d\u00e9lice.", exEn: "Creamy mussels are a delight.", cat: "Meat & Seafood" },
-  { fr: "le jambon", en: "ham", ex: "Je prends du jambon pour le sandwich.", exEn: "I take ham for the sandwich.", cat: "Meat & Seafood" },
+  // The Menu
+  { fr: "la carte", en: "the menu", ex: "Voici la carte. Avez-vous des questions ?", exEn: "Here is the menu. Do you have any questions?", cat: "The Menu" },
+  { fr: "la carte des vins", en: "the wine list", ex: "Puis-je avoir la carte des vins, s'il vous pla\u00eet ?", exEn: "Can I have the wine list, please?", cat: "The Menu" },
+  { fr: "une starter / une entr\u00e9e", en: "an appetizer / starter", ex: "Je vais prendre une salade comme entr\u00e9e.", exEn: "I'll have a salad as a starter.", cat: "The Menu" },
+  { fr: "le plat du jour", en: "the dish of the day", ex: "Quel est le plat du jour aujourd'hui ?", exEn: "What is the dish of the day today?", cat: "The Menu" },
+  { fr: "le plat principal", en: "the main course", ex: "Je vais prendre le poulet r\u00f4ti comme plat principal.", exEn: "I'll have the roast chicken as the main course.", cat: "The Menu" },
+  { fr: "le dessert", en: "the dessert", ex: "Quels desserts recommandez-vous ?", exEn: "What desserts do you recommend?", cat: "The Menu" },
+  { fr: "v\u00e9g\u00e9tarien / v\u00e9g\u00e9tienne", en: "vegetarian", ex: "Y a-t-il des options v\u00e9g\u00e9tariennes ?", exEn: "Are there vegetarian options?", cat: "The Menu" },
+  { fr: "sans gluten", en: "gluten-free", ex: "Avez-vous des plats sans gluten ?", exEn: "Do you have gluten-free dishes?", cat: "The Menu" },
+  { fr: "allergies", en: "allergies", ex: "Je suis allergique aux cacahu\u00e8tes.", exEn: "I am allergic to peanuts.", cat: "The Menu" },
 
-  { fr: "le lait", en: "milk", ex: "Je bois un verre de lait le matin.", exEn: "I drink a glass of milk in the morning.", cat: "Dairy & Bakery" },
-  { fr: "le fromage", en: "cheese", ex: "La France produit d'excellents fromages.", exEn: "France produces excellent cheeses.", cat: "Dairy & Bakery" },
-  { fr: "le beurre", en: "butter", ex: "Ajoute du beurre dans la po\u00eal\u00e9.", exEn: "Add butter to the pan.", cat: "Dairy & Bakery" },
-  { fr: "les \u0153ufs (m)", en: "eggs", ex: "Je pr\u00e9pare des \u0153ufs brouill\u00e9s.", exEn: "I prepare scrambled eggs.", cat: "Dairy & Bakery" },
-  { fr: "la cr\u00e8me fra\u00eeche", en: "sour cream", ex: "La cr\u00e8me fra\u00eeche rend les sauces cr\u00e9meuses.", exEn: "Sour cream makes sauces creamy.", cat: "Dairy & Bakery" },
-  { fr: "le yaourt", en: "yogurt", ex: "Je mange du yaourt grec au petit d\u00e9jeuner.", exEn: "I eat Greek yogurt for breakfast.", cat: "Dairy & Bakery" },
-  { fr: "la baguette", en: "a baguette", ex: "J'ach\u00e8te une baguette fra\u00eeche chaque jour.", exEn: "I buy a fresh baguette every day.", cat: "Dairy & Bakery" },
-  { fr: "un croissant", en: "a croissant", ex: "Les croissants sont croustillants le matin.", exEn: "Croissants are crispy in the morning.", cat: "Dairy & Bakery" },
-  { fr: "le pain complet", en: "wholemeal bread", ex: "Le pain complet est plus nutritif.", exEn: "Wholemeal bread is more nutritious.", cat: "Dairy & Bakery" },
+  // Ordering
+  { fr: "je voudrais", en: "I would like", ex: "Je voudrais un verre de vin blanc, s'il vous pla\u00eet.", exEn: "I would like a glass of white wine, please.", cat: "Ordering" },
+  { fr: "je vais prendre", en: "I will have / I'll take", ex: "Je vais prendre le st\u00e9ak avec des frites.", exEn: "I'll have the steak with fries.", cat: "Ordering" },
+  { fr: "qu'est-ce que vous recommandez ?", en: "what do you recommend?", ex: "Qu'est-ce que vous recommandez ? C'est votre premi\u00e8re fois ?", exEn: "What do you recommend? Is this your first time?", cat: "Ordering" },
+  { fr: "une portion / une assiette", en: "a portion / a plate", ex: "Je vais prendre une portion de fruits de mer.", exEn: "I'll have a portion of seafood.", cat: "Ordering" },
+  { fr: "avec ou sans ?", en: "with or without?", ex: "Sauce b\u00e9arnaise avec ou sans ?", exEn: "B\u00e9arnaise sauce with or without?", cat: "Ordering" },
+  { fr: "l'addition s'il vous pla\u00eet", en: "the check/bill please", ex: "L'addition s'il vous pla\u00eet, nous sommes press\u00e9s.", exEn: "The check please, we're in a hurry.", cat: "Ordering" },
+  { fr: "\u00e0 partager", en: "to share", ex: "Voulons-nous commander des entr\u00e9es \u00e0 partager ?", exEn: "Do you want to order appetizers to share?", cat: "Ordering" },
 
-  { fr: "la farine", en: "flour", ex: "J'ai besoin de farine pour les cr\u00eapes.", exEn: "I need flour for crepes.", cat: "Pantry Staples" },
-  { fr: "le sucre", en: "sugar", ex: "Je mets du sucre dans mon caf\u00e9.", exEn: "I put sugar in my coffee.", cat: "Pantry Staples" },
-  { fr: "l'huile (f)", en: "oil", ex: "L'huile d'olive est bonne pour la sant\u00e9.", exEn: "Olive oil is good for your health.", cat: "Pantry Staples" },
-  { fr: "le sel", en: "salt", ex: "N'oublie pas le sel dans l'eau de cuisson.", exEn: "Don't forget the salt in the cooking water.", cat: "Pantry Staples" },
-  { fr: "le poivre", en: "pepper", ex: "Assaisonne avec du sel et du poivre.", exEn: "Season with salt and pepper.", cat: "Pantry Staples" },
-  { fr: "le riz", en: "rice", ex: "Je pr\u00e9f\u00e8re le riz blanc.", exEn: "I prefer white rice.", cat: "Pantry Staples" },
-  { fr: "les p\u00e2tes (f)", en: "pasta", ex: "Les p\u00e2tes \u00e0 la carbonara sont italienne.", exEn: "Pasta carbonara is Italian.", cat: "Pantry Staples" },
-  { fr: "le vinaigre", en: "vinegar", ex: "Ajoute un peu de vinaigre pour le go\u00fbt.", exEn: "Add a little vinegar for taste.", cat: "Pantry Staples" },
-  { fr: "la moutarde", en: "mustard", ex: "Je mets de la moutarde sur mon sandwich.", exEn: "I put mustard on my sandwich.", cat: "Pantry Staples" },
-  { fr: "le miel", en: "honey", ex: "Le miel rend le th\u00e9 plus doux.", exEn: "Honey makes tea sweeter.", cat: "Pantry Staples" },
+  // Drinks
+  { fr: "une carafe d'eau", en: "a pitcher of water", ex: "Pouvons-nous avoir une carafe d'eau, s'il vous pla\u00eet ?", exEn: "Can we have a pitcher of water, please?", cat: "Drinks" },
+  { fr: "de l'eau gazeuse / plate", en: "sparkling / still water", ex: "Je voudrais de l'eau gazeuse, pas plate.", exEn: "I would like sparkling water, not still.", cat: "Drinks" },
+  { fr: "un verre de vin", en: "a glass of wine", ex: "Un verre de vin rouge, s'il vous pla\u00eet.", exEn: "A glass of red wine, please.", cat: "Drinks" },
+  { fr: "un vin blanc / rouge / ros\u00e9", en: "a white / red / ros\u00e9 wine", ex: "Quelle est votre recommandation pour un vin blanc ?", exEn: "What is your recommendation for a white wine?", cat: "Drinks" },
+  { fr: "une bi\u00e8re", en: "a beer", ex: "Je vais prendre une bi\u00e8re, s'il vous pla\u00eet.", exEn: "I'll have a beer, please.", cat: "Drinks" },
+  { fr: "un caf\u00e9 / un expr\u00e9s", en: "a coffee / an espresso", ex: "Je prends un caf\u00e9 apr\u00e8s le repas.", exEn: "I'll have a coffee after the meal.", cat: "Drinks" },
+  { fr: "un th\u00e9", en: "a tea", ex: "Puis-je avoir un th\u00e9 vert, s'il vous pla\u00eet ?", exEn: "Can I have a green tea, please?", cat: "Drinks" },
+  { fr: "un verre / une tasse", en: "a glass / a cup", ex: "Apportez-moi un verre de jus d'orange.", exEn: "Bring me a glass of orange juice.", cat: "Drinks" },
+  { fr: "un jus de fruit", en: "a fruit juice", ex: "Avez-vous un jus de pomme frais ?", exEn: "Do you have fresh apple juice?", cat: "Drinks" },
 
-  { fr: "le rayon", en: "the aisle / shelf", ex: "Le rayon des fruits est au fond du magasin.", exEn: "The fruit aisle is at the back of the store.", cat: "At the Store" },
-  { fr: "le prix", en: "the price", ex: "Quel est le prix de ce fromage ?", exEn: "What is the price of this cheese?", cat: "At the Store" },
-  { fr: "une promotion", en: "a sale / promotion", ex: "Il y a une promotion sur les yaourts.", exEn: "There's a sale on yogurts.", cat: "At the Store" },
-  { fr: "peser", en: "to weigh", ex: "Je dois peser les pommes.", exEn: "I need to weigh the apples.", cat: "At the Store" },
-  { fr: "un chariot", en: "a shopping cart", ex: "Prends un chariot, on achète beaucoup.", exEn: "Get a cart, we're buying a lot.", cat: "At the Store" },
-  { fr: "une liste de courses", en: "a shopping list", ex: "J'ai \u00e9crit une liste avant d'aller au supermarch\u00e9.", exEn: "I wrote a list before going to the supermarket.", cat: "At the Store" },
-  { fr: "la caisse", en: "the checkout", ex: "Il y a une queue \u00e0 la caisse.", exEn: "There's a line at the checkout.", cat: "At the Store" },
-  { fr: "payer", en: "to pay", ex: "Tu peux payer par carte de cr\u00e9dit.", exEn: "You can pay by credit card.", cat: "At the Store" },
+  // Meat & Fish Dishes
+  { fr: "saignant", en: "rare (meat)", ex: "Je voudrais mon st\u00e9ak saignant.", exEn: "I would like my steak rare.", cat: "Meat & Fish Dishes" },
+  { fr: "\u00e0 point", en: "medium (meat)", ex: "Un st\u00e9ak \u00e0 point, s'il vous pla\u00eet.", exEn: "A medium steak, please.", cat: "Meat & Fish Dishes" },
+  { fr: "bien cuit", en: "well-done (meat)", ex: "Je pr\u00e9f\u00e8re ma viande bien cuite.", exEn: "I prefer my meat well-done.", cat: "Meat & Fish Dishes" },
+  { fr: "grill\u00e9", en: "grilled", ex: "Le poisson grill\u00e9 est excellent ici.", exEn: "The grilled fish is excellent here.", cat: "Meat & Fish Dishes" },
+  { fr: "le filet", en: "the fillet / tenderloin", ex: "Je vais prendre le filet de b\u0153uf.", exEn: "I'll have the beef fillet.", cat: "Meat & Fish Dishes" },
+  { fr: "une c\u00f4te", en: "a chop / cutlet", ex: "Les c\u00f4tes d'agneau sont d\u00e9licieuses.", exEn: "The lamb chops are delicious.", cat: "Meat & Fish Dishes" },
+  { fr: "roti / r\u00f4ti", en: "roasted", ex: "Le poulet r\u00f4ti avec des l\u00e9gumes.", exEn: "Roasted chicken with vegetables.", cat: "Meat & Fish Dishes" },
+  { fr: "cuit \u00e0 la vapeur", en: "steamed", ex: "Le poisson cuit \u00e0 la vapeur est tr\u00e8s sain.", exEn: "Steamed fish is very healthy.", cat: "Meat & Fish Dishes" },
+  { fr: "fruits de mer", en: "seafood", ex: "Je voudrais une assiette de fruits de mer.", exEn: "I would like a plate of seafood.", cat: "Meat & Fish Dishes" },
 
-  { fr: "une casserole", en: "a pot / saucepan", ex: "Je fais bouillir l'eau dans une casserole.", exEn: "I boil water in a pot.", cat: "Kitchen Tools" },
-  { fr: "une po\u00eal\u00e9", en: "a frying pan", ex: "Fais sauter les l\u00e9gumes dans la po\u00eal\u00e9.", exEn: "Saute the vegetables in the frying pan.", cat: "Kitchen Tools" },
-  { fr: "un couteau", en: "a knife", ex: "Je dois a\u00e9guiser mon couteau.", exEn: "I need to sharpen my knife.", cat: "Kitchen Tools" },
-  { fr: "une planche \u00e0 d\u00e9couper", en: "a cutting board", ex: "Coupe les l\u00e9gumes sur la planche.", exEn: "Cut the vegetables on the cutting board.", cat: "Kitchen Tools" },
-  { fr: "un four", en: "an oven", ex: "Mets le poulet au four \u00e0 200 degr\u00e9s.", exEn: "Put the chicken in the oven at 200 degrees.", cat: "Kitchen Tools" },
-  { fr: "une cuiller", en: "a spoon", ex: "Utilise une cuiller en bois pour m\u00e9langer.", exEn: "Use a wooden spoon to mix.", cat: "Kitchen Tools" },
-  { fr: "une fourchette", en: "a fork", ex: "Pique la viande avec une fourchette.", exEn: "Pierce the meat with a fork.", cat: "Kitchen Tools" },
-  { fr: "un \u00e9plucheur", en: "a peeler", ex: "Utilise l'\u00e9plucheur pour les pommes de terre.", exEn: "Use the peeler for potatoes.", cat: "Kitchen Tools" },
+  // Side Dishes & Salads
+  { fr: "les frites", en: "the fries / chips", ex: "Je vais prendre un st\u00e9ak avec des frites.", exEn: "I'll have a steak with fries.", cat: "Side Dishes & Salads" },
+  { fr: "une salade verte", en: "a green salad", ex: "Une petite salade verte pour commencer.", exEn: "A small green salad to start.", cat: "Side Dishes & Salads" },
+  { fr: "une salade de tomates", en: "a tomato salad", ex: "Je veux une salade de tomates fra\u00eeches.", exEn: "I want a fresh tomato salad.", cat: "Side Dishes & Salads" },
+  { fr: "les l\u00e9gumes", en: "the vegetables", ex: "Quel est le l\u00e9gume du jour ?", exEn: "What is the vegetable of the day?", cat: "Side Dishes & Salads" },
+  { fr: "du riz", en: "rice", ex: "Je pr\u00e9f\u00e8re le riz aux frites.", exEn: "I prefer rice to fries.", cat: "Side Dishes & Salads" },
+  { fr: "des pommes de terre", en: "potatoes", ex: "Pouvez-vous remplacer les frites par des pommes de terre ?", exEn: "Can you replace the fries with potatoes?", cat: "Side Dishes & Salads" },
+  { fr: "du pain", en: "bread", ex: "Puis-je avoir un peu plus de pain ?", exEn: "Can I have a bit more bread?", cat: "Side Dishes & Salads" },
 
-  { fr: "couper", en: "to cut", ex: "Coupe les oignons finement.", exEn: "Cut the onions finely.", cat: "Cooking Verbs" },
-  { fr: "m\u00e9langer", en: "to mix", ex: "M\u00e9lange les ingr\u00e9dients dans un bol.", exEn: "Mix the ingredients in a bowl.", cat: "Cooking Verbs" },
-  { fr: "faire bouillir", en: "to boil", ex: "Fais bouillir l'eau pour les p\u00e2tes.", exEn: "Boil the water for pasta.", cat: "Cooking Verbs" },
-  { fr: "\u00e9plucher", en: "to peel", ex: "\u00c9pluche les carottes avant de les cuire.", exEn: "Peel the carrots before cooking them.", cat: "Cooking Verbs" },
-  { fr: "assaisonner", en: "to season", ex: "Assaisonne le plat avec du sel et du poivre.", exEn: "Season the dish with salt and pepper.", cat: "Cooking Verbs" },
-  { fr: "faire sauter", en: "to saute", ex: "Fais sauter les champignons dans le beurre.", exEn: "Saute the mushrooms in butter.", cat: "Cooking Verbs" },
-  { fr: "faire cuire", en: "to cook", ex: "Fais cuire le poulet pendant 45 minutes.", exEn: "Cook the chicken for 45 minutes.", cat: "Cooking Verbs" },
-  { fr: "r\u00f4tir", en: "to roast", ex: "R\u00f4tis les l\u00e9gumes au four.", exEn: "Roast the vegetables in the oven.", cat: "Cooking Verbs" },
-  { fr: "mijoter", en: "to simmer", ex: "Laisse mijoter la sauce 20 minutes.", exEn: "Let the sauce simmer for 20 minutes.", cat: "Cooking Verbs" },
-  { fr: "go\u00fbter", en: "to taste", ex: "Go\u00fbte la soupe et ajoute du sel.", exEn: "Taste the soup and add salt.", cat: "Cooking Verbs" },
+  // Complaints & Requests
+  { fr: "c'est froid", en: "it's cold", ex: "Excusez-moi, c'est froid. Pouvez-vous le r\u00e9chauffer ?", exEn: "Excuse me, it's cold. Can you warm it up?", cat: "Complaints & Requests" },
+  { fr: "c'est trop sal\u00e9", en: "it's too salty", ex: "C'est un peu trop sal\u00e9 pour moi.", exEn: "It's a bit too salty for me.", cat: "Complaints & Requests" },
+  { fr: "il manque", en: "there is missing / lacking", ex: "Il manque une fourchette \u00e0 notre table.", exEn: "There is a missing fork at our table.", cat: "Complaints & Requests" },
+  { fr: "encore un peu de", en: "a bit more of", ex: "Pouvez-vous m'apporter encore un peu de sauce ?", exEn: "Can you bring me a bit more sauce?", cat: "Complaints & Requests" },
+  { fr: "sans sauce", en: "without sauce", ex: "Je voudrais mon plat sans sauce, s'il vous pla\u00eet.", exEn: "I would like my dish without sauce, please.", cat: "Complaints & Requests" },
+  { fr: "c'est trop \u00e9pic\u00e9", en: "it's too spicy", ex: "C'est trop \u00e9pic\u00e9 pour moi, je vais le retourner.", exEn: "It's too spicy for me, I'm going to send it back.", cat: "Complaints & Requests" },
+  { fr: "un verre propre", en: "a clean glass", ex: "Puis-je avoir un verre propre, s'il vous pla\u00eet ?", exEn: "Can I have a clean glass, please?", cat: "Complaints & Requests" },
+  { fr: "l'addition", en: "the check / the bill", ex: "L'addition, s'il vous pla\u00eet.", exEn: "The check, please.", cat: "Complaints & Requests" },
 
-  { fr: "une recette", en: "a recipe", ex: "J'aime suivre des recettes sur Internet.", exEn: "I like to follow recipes online.", cat: "Recipes & Taste" },
-  { fr: "sal\u00e9", en: "salty", ex: "Cette sauce est trop sal\u00e9e.", exEn: "This sauce is too salty.", cat: "Recipes & Taste" },
-  { fr: "sucr\u00e9", en: "sweet", ex: "Les desserts sont sucr\u00e9s.", exEn: "Desserts are sweet.", cat: "Recipes & Taste" },
-  { fr: "\u00e9pic\u00e9", en: "spicy", ex: "Ce curry est tr\u00e8s \u00e9pic\u00e9.", exEn: "This curry is very spicy.", cat: "Recipes & Taste" },
-  { fr: "d\u00e9licieux", en: "delicious", ex: "Le repas \u00e9tait d\u00e9licieux.", exEn: "The meal was delicious.", cat: "Recipes & Taste" },
-  { fr: "l\u00e9ger", en: "light", ex: "Je veux un repas l\u00e9ger ce soir.", exEn: "I want a light meal tonight.", cat: "Recipes & Taste" },
+  // Compliments & Politeness
+  { fr: "c'est d\u00e9licieux", en: "it's delicious", ex: "C'est d\u00e9licieux ! Mes compliments au chef.", exEn: "It's delicious! My compliments to the chef.", cat: "Compliments & Politeness" },
+  { fr: "c'est excellent", en: "it's excellent", ex: "Ce vin est excellent avec le poisson.", exEn: "This wine is excellent with the fish.", cat: "Compliments & Politeness" },
+  { fr: "merci beaucoup", en: "thank you very much", ex: "Merci beaucoup pour votre service.", exEn: "Thank you very much for your service.", cat: "Compliments & Politeness" },
+  { fr: "s'il vous pla\u00eet", en: "please (formal)", ex: "L'addition, s'il vous pla\u00eet.", exEn: "The check, please.", cat: "Compliments & Politeness" },
+  { fr: "s'il te pla\u00eet", en: "please (informal)", ex: "Un verre d'eau, s'il te pla\u00eet.", exEn: "A glass of water, please.", cat: "Compliments & Politeness" },
+  { fr: "bonne app\u00e9tit", en: "enjoy your meal", ex: "Bonne app\u00e9tit ! Bon app\u00e9tit \u00e0 tous !", exEn: "Enjoy your meal! Bon app\u00e9tit everyone!", cat: "Compliments & Politeness" },
+  { fr: "bonne soir\u00e9e", en: "good evening / have a nice evening", ex: "Merci, bonne soir\u00e9e \u00e0 vous aussi !", exEn: "Thank you, good evening to you too!", cat: "Compliments & Politeness" },
+  { fr: "un pourboire", en: "a tip", ex: "Voici un pourboire pour votre excellent service.", exEn: "Here is a tip for your excellent service.", cat: "Compliments & Politeness" },
+  { fr: "de rien", en: "you're welcome", ex: "Merci ! - De rien, bon app\u00e9tit !", exEn: "Thank you! - You're welcome, enjoy!", cat: "Compliments & Politeness" },
 ];
 
 const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
 
 const CAT_COLORS = {
-  "Fruits & Vegetables": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
-  "Meat & Seafood": { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
-  "Dairy & Bakery": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
-  "Pantry Staples": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
-  "At the Store": { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
-  "Kitchen Tools": { bg: "rgb(224, 231, 255)", border: "rgb(99, 102, 241)", text: "rgb(67, 56, 202)" },
-  "Cooking Verbs": { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
-  "Recipes & Taste": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+  "Arriving & Reservations": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)",   text: "rgb(21, 128, 61)" },
+  "The Menu":                 { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+  "Ordering":                 { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)",  text: "rgb(29, 78, 216)" },
+  "Drinks":                   { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)",  text: "rgb(126, 34, 206)" },
+  "Meat & Fish Dishes":       { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)",  text: "rgb(185, 28, 28)" },
+  "Side Dishes & Salads":     { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)",  text: "rgb(194, 65, 12)" },
+  "Complaints & Requests":    { bg: "rgb(252, 231, 243)", border: "rgb(236, 72, 153)",  text: "rgb(190, 24, 93)" },
+  "Compliments & Politeness": { bg: "rgb(230, 230, 250)", border: "rgb(147, 112, 219)", text: "rgb(75, 0, 130)" },
 };
 
 // Text-to-speech
@@ -122,7 +125,7 @@ function speak(text, rate = 0.9) {
   utter.rate = rate;
   const voices = window.speechSynthesis.getVoices();
   const frVoice = voices.find(v => v.lang === "fr-FR" && v.name.includes("Thomas"))
-    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Amélie"))
+    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Am\u00e9lie"))
     || voices.find(v => v.lang === "fr-FR" && !v.name.includes("Google"))
     || voices.find(v => v.lang.startsWith("fr"));
   if (frVoice) utter.voice = frVoice;
@@ -176,10 +179,7 @@ function FlashCards() {
 
   const deck = useMemo(() => {
     let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
-    if (hideKnown) cards = cards.filter((_, i) => {
-      const globalIdx = CARDS.indexOf(cards === CARDS ? CARDS[i] : cards[i]);
-      return !known.has(globalIdx);
-    });
+    if (hideKnown) cards = cards.filter(c => !known.has(CARDS.indexOf(c)));
     return shuffled ? shuffle(cards) : cards;
   }, [activeCat, shuffled, hideKnown, known]);
 
@@ -198,7 +198,7 @@ function FlashCards() {
     });
   }, [globalIdx]);
 
-  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Fruits & Vegetables"];
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["Arriving & Reservations"];
 
   useEffect(() => {
     const handler = (e) => {
@@ -210,7 +210,6 @@ function FlashCards() {
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
 
-  // Swipe support for mobile
   const [touchStart, setTouchStart] = useState(null);
   const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
   const handleTouchEnd = (e) => {
@@ -225,10 +224,10 @@ function FlashCards() {
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0 }}>
-            Les Courses et la Cuisine
+            Au Restaurant
           </h1>
           <p style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
-            {CARDS.length} words &amp; phrases for shopping and cooking in French
+            {CARDS.length} words &amp; phrases for dining out in French
           </p>
         </div>
 
@@ -302,7 +301,7 @@ function FlashCards() {
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               style={{
-                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 320,
+                perspective: 1000, cursor: "pointer", marginBottom: 16, height: 340,
                 userSelect: "none", WebkitTapHighlightColor: "transparent",
               }}
             >
@@ -311,6 +310,7 @@ function FlashCards() {
                 transformStyle: "preserve-3d", transition: "transform 0.5s",
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
               }}>
+                {/* Front */}
                 <div style={{
                   position: "absolute", inset: 0, backfaceVisibility: "hidden",
                   background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
@@ -327,6 +327,7 @@ function FlashCards() {
                     Tap to reveal
                   </div>
                 </div>
+                {/* Back */}
                 <div style={{
                   position: "absolute", inset: 0, backfaceVisibility: "hidden",
                   transform: "rotateY(180deg)",
@@ -342,7 +343,7 @@ function FlashCards() {
                   <div
                     onClick={(e) => { e.stopPropagation(); setShowTranslation(s => !s); }}
                     style={{
-                      marginTop: 20, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
+                      marginTop: 18, padding: "12px 16px", background: "rgba(255,255,255,0.7)",
                       borderRadius: 10, borderLeft: `4px solid ${colors.border}`, width: "100%", maxWidth: 400,
                       cursor: "pointer", position: "relative", transition: "background 0.2s",
                     }}
