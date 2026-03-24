@@ -30,72 +30,72 @@
     // ============================================================================
     const CARDS = [
       // === ÊTRE OU AVOIR? (Rule/Concept Cards) ===
-      { type: "rule", front: "Quel verbe auxiliaire pour les verbes DR MRS VANDERTRAMP?", back: "être — Ces 17 verbes de mouvement/changement d'état utilisent toujours être au passé composé", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Quels sont les 17 verbes DR MRS VANDERTRAMP?", back: "Devenir, Revenir, Monter, Rester, Sortir, Venir, Aller, Naître, Descendre, Entrer, Rentrer, Tomber, Retourner, Arriver, Mourir, Partir — Tous utilisent être", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Quel verbe auxiliaire pour les verbes réfléchis?", back: "être — Tous les verbes réfléchis (se + verbe) utilisent être au passé composé", cat: "Être ou Avoir?" },
-      { type: "rule", front: "La plupart des verbes français utilisent quel auxiliaire?", back: "avoir — La grande majorité des verbes utilisent avoir au passé composé", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Les verbes monter, descendre, sortir, rentrer, passer peuvent-ils utiliser avoir?", back: "Oui! Avec un complément d'objet direct → avoir. Sans → être. 'Il est monté' (il a monté) vs 'Il a monté les valises' (avec objet)", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Accord du participe passé avec être?", back: "Le participe passé s'accorde avec le sujet. Elle est allée (f.s.), Ils sont partis (m.pl.), Elles sont revenues (f.pl.)", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Accord du participe passé avec avoir?", back: "Le participe passé s'accorde avec le COD (complément d'objet direct) s'il précède le verbe. 'Les films que j'ai regardés' mais 'J'ai regardé les films'", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Quel est le participe passé d'un verbe -er?", back: "-er → -é. Exemple: parler → parlé, manger → mangé, regarder → regardé", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Quel est le participe passé d'un verbe -ir?", back: "-ir → -i. Exemple: finir → fini, choisir → choisi, remplir → rempli", cat: "Être ou Avoir?" },
-      { type: "rule", front: "Quel est le participe passé d'un verbe -re?", back: "-re → -u. Exemple: vendre → vendu, répondre → répondu, attendre → attendu", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quel verbe auxiliaire pour les verbes DR MRS VANDERTRAMP?", back: "\u00eatre \u2014 Ces 17 verbes de mouvement/changement d'\u00e9tat utilisent toujours \u00eatre au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Quels sont les 17 verbes DR MRS VANDERTRAMP?", back: "Devenir, Revenir, Monter, Rester, Sortir, Venir, Aller, Na\u00eetre, Descendre, Entrer, Rentrer, Tomber, Retourner, Arriver, Mourir, Partir \u2014 Tous utilisent \u00eatre", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Quel verbe auxiliaire pour les verbes r\u00e9fl\u00e9chis?", back: "\u00eatre \u2014 Tous les verbes r\u00e9fl\u00e9chis (se + verbe) utilisent \u00eatre au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "La plupart des verbes fran\u00e7ais utilisent quel auxiliaire?", back: "avoir \u2014 La grande majorit\u00e9 des verbes utilisent avoir au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Les verbes monter, descendre, sortir, rentrer, passer peuvent-ils utiliser avoir?", back: "Oui! Avec un compl\u00e9ment d'objet direct \u2192 avoir. Sans \u2192 \u00eatre. 'Il est mont\u00e9' vs 'Il a mont\u00e9 les valises' (avec objet)", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Accord du participe pass\u00e9 avec \u00eatre?", back: "Le participe pass\u00e9 s'accorde avec le sujet. Elle est all\u00e9e (f.s.), Ils sont partis (m.pl.), Elles sont revenues (f.pl.)", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Accord du participe pass\u00e9 avec avoir?", back: "Le participe pass\u00e9 s'accorde avec le COD s'il pr\u00e9c\u00e8de le verbe. 'Les films que j'ai regard\u00e9s' mais 'J'ai regard\u00e9 les films'", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -er?", back: "-er \u2192 -\u00e9. Exemple: parler \u2192 parl\u00e9, manger \u2192 mang\u00e9, regarder \u2192 regard\u00e9", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -ir?", back: "-ir \u2192 -i. Exemple: finir \u2192 fini, choisir \u2192 choisi, remplir \u2192 rempli", cat: "\u00catre ou Avoir?" },
+      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -re?", back: "-re \u2192 -u. Exemple: vendre \u2192 vendu, r\u00e9pondre \u2192 r\u00e9pondu, attendre \u2192 attendu", cat: "\u00catre ou Avoir?" },
 
       // === ÊTRE VERBS (Fill-in-the-blank) ===
-      { type: "fill", sentence: "Elle ___ ___ à Paris hier.", answer: "est allée", hint: "aller (f.s.)", en: "She went to Paris yesterday.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Nous ___ ___ à huit heures.", answer: "sommes partis", hint: "partir (m.pl.)", en: "We left at eight o'clock.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Ils ___ ___ du train.", answer: "sont descendus", hint: "descendre (m.pl.)", en: "They got off the train.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Je ___ ___ médecin.", answer: "suis devenu", hint: "devenir (m.s.)", en: "I became a doctor.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Elles ___ ___ l'année dernière.", answer: "sont nées", hint: "naître (f.pl.)", en: "They were born last year.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Il ___ ___ à minuit.", answer: "est arrivé", hint: "arriver (m.s.)", en: "He arrived at midnight.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Elles ___ ___ tard ce soir.", answer: "sont rentrées", hint: "rentrer (f.pl.)", en: "They came back home late tonight.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Tu ___ ___ au premier étage.", answer: "es monté", hint: "monter (m.s.)", en: "You went up to the first floor.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Il ___ ___ pendant la guerre.", answer: "est mort", hint: "mourir (m.s.)", en: "He died during the war.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Elles ___ ___ au cinéma samedi.", answer: "sont allées", hint: "aller (f.pl.)", en: "They went to the cinema on Saturday.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Vous ___ ___ tôt le matin.", answer: "êtes venus", hint: "venir (pl.)", en: "You came early in the morning.", cat: "Être Verbs" },
-      { type: "fill", sentence: "Elle ___ ___ longtemps ici.", answer: "est restée", hint: "rester (f.s.)", en: "She stayed here for a long time.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Elle ______ \u00e0 Paris hier.", answer: "est all\u00e9e", infinitive: "aller", agreement: "f.s.", en: "She went to Paris yesterday.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Nous ______ \u00e0 huit heures.", answer: "sommes partis", infinitive: "partir", agreement: "m.pl.", en: "We left at eight o'clock.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Ils ______ du train.", answer: "sont descendus", infinitive: "descendre", agreement: "m.pl.", en: "They got off the train.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Je ______ m\u00e9decin.", answer: "suis devenu", infinitive: "devenir", agreement: "m.s.", en: "I became a doctor.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Elles ______ l'ann\u00e9e derni\u00e8re.", answer: "sont n\u00e9es", infinitive: "na\u00eetre", agreement: "f.pl.", en: "They were born last year.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Il ______ \u00e0 minuit.", answer: "est arriv\u00e9", infinitive: "arriver", agreement: "m.s.", en: "He arrived at midnight.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Elles ______ tard ce soir.", answer: "sont rentr\u00e9es", infinitive: "rentrer", agreement: "f.pl.", en: "They came back home late tonight.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Tu ______ au premier \u00e9tage.", answer: "es mont\u00e9", infinitive: "monter", agreement: "m.s.", en: "You went up to the first floor.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Il ______ pendant la guerre.", answer: "est mort", infinitive: "mourir", agreement: "m.s.", en: "He died during the war.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Elles ______ au cin\u00e9ma samedi.", answer: "sont all\u00e9es", infinitive: "aller", agreement: "f.pl.", en: "They went to the cinema on Saturday.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Vous ______ t\u00f4t le matin.", answer: "\u00eates venus", infinitive: "venir", agreement: "m.pl.", en: "You came early in the morning.", cat: "\u00catre Verbs" },
+      { type: "fill", sentence: "Elle ______ longtemps ici.", answer: "est rest\u00e9e", infinitive: "rester", agreement: "f.s.", en: "She stayed here for a long time.", cat: "\u00catre Verbs" },
 
       // === REFLEXIVE VERBS ===
-      { type: "fill", sentence: "Elle ___ ___ ___ tôt ce matin.", answer: "s'est levée", hint: "se lever (f.s.)", en: "She got up early this morning.", cat: "Reflexive Verbs" },
-      { type: "fill", sentence: "Nous ___ ___ ___ dans le parc.", answer: "nous sommes promenés", hint: "se promener (m.pl.)", en: "We took a walk in the park.", cat: "Reflexive Verbs" },
-      { type: "fill", sentence: "Ils ___ ___ ___ avant le dîner.", answer: "se sont lavés", hint: "se laver (m.pl.)", en: "They washed themselves before dinner.", cat: "Reflexive Verbs" },
-      { type: "fill", sentence: "Je ___ ___ ___ hier soir.", answer: "me suis couché", hint: "se coucher (m.s.)", en: "I went to bed last night.", cat: "Reflexive Verbs" },
-      { type: "fill", sentence: "Vous ___ ___ ___ à huit heures.", answer: "vous êtes réveillés", hint: "se réveiller (pl.)", en: "You woke up at eight o'clock.", cat: "Reflexive Verbs" },
-      { type: "fill", sentence: "Elle ___ ___ ___ avec son frère.", answer: "s'est disputée", hint: "se disputer (f.s.)", en: "She argued with her brother.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Elle ______ t\u00f4t ce matin.", answer: "s'est lev\u00e9e", infinitive: "se lever", agreement: "f.s.", en: "She got up early this morning.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Nous ______ dans le parc.", answer: "nous sommes promen\u00e9s", infinitive: "se promener", agreement: "m.pl.", en: "We took a walk in the park.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Ils ______ avant le d\u00eener.", answer: "se sont lav\u00e9s", infinitive: "se laver", agreement: "m.pl.", en: "They washed themselves before dinner.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Je ______ hier soir.", answer: "me suis couch\u00e9", infinitive: "se coucher", agreement: "m.s.", en: "I went to bed last night.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Vous ______ \u00e0 huit heures.", answer: "vous \u00eates r\u00e9veill\u00e9s", infinitive: "se r\u00e9veiller", agreement: "m.pl.", en: "You woke up at eight o'clock.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Elle ______ avec son fr\u00e8re.", answer: "s'est disput\u00e9e", infinitive: "se disputer", agreement: "f.s.", en: "She argued with her brother.", cat: "Reflexive Verbs" },
 
       // === AVOIR VERBS ===
-      { type: "fill", sentence: "J'___ ___ un bon film.", answer: "ai regardé", hint: "regarder", en: "I watched a good movie.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Nous ___ ___ au restaurant.", answer: "avons mangé", hint: "manger", en: "We ate at the restaurant.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Elle ___ ___ ses amies hier.", answer: "a invité", hint: "inviter (f.)", en: "She invited her friends yesterday.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Ils ___ ___ beaucoup de plaisir.", answer: "ont eu", hint: "avoir", en: "They had a lot of pleasure.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Tu ___ ___ tes devoirs?", answer: "as fini", hint: "finir", en: "Did you finish your homework?", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Vous ___ ___ à la question.", answer: "avez répondu", hint: "répondre", en: "You answered the question.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "J'___ ___ le livre ce mois-ci.", answer: "ai lu", hint: "lire", en: "I read the book this month.", cat: "Avoir Verbs" },
-      { type: "fill", sentence: "Elle ___ ___ une belle robe.", answer: "a acheté", hint: "acheter", en: "She bought a beautiful dress.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "J'______ un bon film.", answer: "ai regard\u00e9", infinitive: "regarder", en: "I watched a good movie.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Nous ______ au restaurant.", answer: "avons mang\u00e9", infinitive: "manger", en: "We ate at the restaurant.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Elle ______ ses amies hier.", answer: "a invit\u00e9", infinitive: "inviter", en: "She invited her friends yesterday.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Ils ______ beaucoup de plaisir.", answer: "ont eu", infinitive: "avoir", en: "They had a lot of fun.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Tu ______ tes devoirs?", answer: "as fini", infinitive: "finir", en: "Did you finish your homework?", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Vous ______ \u00e0 la question.", answer: "avez r\u00e9pondu", infinitive: "r\u00e9pondre", en: "You answered the question.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "J'______ le livre ce mois-ci.", answer: "ai lu", infinitive: "lire", en: "I read the book this month.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Elle ______ une belle robe.", answer: "a achet\u00e9", infinitive: "acheter", en: "She bought a beautiful dress.", cat: "Avoir Verbs" },
 
       // === REGULAR -ER → -É ===
-      { type: "fill", sentence: "Elle a ___ (manger) une pomme.", answer: "mangé", hint: "-er → -é", en: "She ate an apple.", cat: "Regular -er → -é" },
-      { type: "fill", sentence: "Nous avons ___ (regarder) la télévision.", answer: "regardé", hint: "-er → -é", en: "We watched television.", cat: "Regular -er → -é" },
-      { type: "fill", sentence: "Ils ont ___ (jouer) au football.", answer: "joué", hint: "-er → -é", en: "They played football.", cat: "Regular -er → -é" },
-      { type: "fill", sentence: "J'ai ___ (parler) avec mon ami.", answer: "parlé", hint: "-er → -é", en: "I talked with my friend.", cat: "Regular -er → -é" },
-      { type: "fill", sentence: "Vous avez ___ (danser) toute la nuit.", answer: "dansé", hint: "-er → -é", en: "You danced all night.", cat: "Regular -er → -é" },
-      { type: "fill", sentence: "Elle a ___ (chanter) une chanson.", answer: "chanté", hint: "-er → -é", en: "She sang a song.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "Elle a ______ une pomme.", answer: "mang\u00e9", infinitive: "manger", hint: "-er \u2192 -\u00e9", en: "She ate an apple.", cat: "Regular -er \u2192 -\u00e9" },
+      { type: "fill", sentence: "Nous avons ______ la t\u00e9l\u00e9vision.", answer: "regard\u00e9", infinitive: "regarder", hint: "-er \u2192 -\u00e9", en: "We watched television.", cat: "Regular -er \u2192 -\u00e9" },
+      { type: "fill", sentence: "Ils ont ______ au football.", answer: "jou\u00e9", infinitive: "jouer", hint: "-er \u2192 -\u00e9", en: "They played football.", cat: "Regular -er \u2192 -\u00e9" },
+      { type: "fill", sentence: "J'ai ______ avec mon ami.", answer: "parl\u00e9", infinitive: "parler", hint: "-er \u2192 -\u00e9", en: "I talked with my friend.", cat: "Regular -er \u2192 -\u00e9" },
+      { type: "fill", sentence: "Vous avez ______ toute la nuit.", answer: "dans\u00e9", infinitive: "danser", hint: "-er \u2192 -\u00e9", en: "You danced all night.", cat: "Regular -er \u2192 -\u00e9" },
+      { type: "fill", sentence: "Elle a ______ une chanson.", answer: "chant\u00e9", infinitive: "chanter", hint: "-er \u2192 -\u00e9", en: "She sang a song.", cat: "Regular -er \u2192 -\u00e9" },
 
       // === REGULAR -IR → -I ===
-      { type: "fill", sentence: "J'ai ___ (finir) mes devoirs.", answer: "fini", hint: "-ir → -i", en: "I finished my homework.", cat: "Regular -ir → -i" },
-      { type: "fill", sentence: "Ils ont ___ (choisir) un cadeau.", answer: "choisi", hint: "-ir → -i", en: "They chose a gift.", cat: "Regular -ir → -i" },
-      { type: "fill", sentence: "Elle a ___ (remplir) le formulaire.", answer: "rempli", hint: "-ir → -i", en: "She filled out the form.", cat: "Regular -ir → -i" },
-      { type: "fill", sentence: "Nous avons ___ (partir) à six heures.", answer: "parti", hint: "-ir → -i (though partir uses être)", en: "We left at six o'clock.", cat: "Regular -ir → -i" },
-      { type: "fill", sentence: "Vous avez ___ (réussir) l'examen.", answer: "réussi", hint: "-ir → -i", en: "You passed the exam.", cat: "Regular -ir → -i" },
-      { type: "fill", sentence: "Ils ont ___ (dormir) longtemps.", answer: "dormi", hint: "-ir → -i", en: "They slept a long time.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "J'ai ______ mes devoirs.", answer: "fini", infinitive: "finir", hint: "-ir \u2192 -i", en: "I finished my homework.", cat: "Regular -ir \u2192 -i" },
+      { type: "fill", sentence: "Ils ont ______ un cadeau.", answer: "choisi", infinitive: "choisir", hint: "-ir \u2192 -i", en: "They chose a gift.", cat: "Regular -ir \u2192 -i" },
+      { type: "fill", sentence: "Elle a ______ le formulaire.", answer: "rempli", infinitive: "remplir", hint: "-ir \u2192 -i", en: "She filled out the form.", cat: "Regular -ir \u2192 -i" },
+      { type: "fill", sentence: "Nous sommes ______ \u00e0 six heures.", answer: "partis", infinitive: "partir", hint: "-ir \u2192 -i (\u00eatre verb!)", en: "We left at six o'clock.", cat: "Regular -ir \u2192 -i" },
+      { type: "fill", sentence: "Vous avez ______ l'examen.", answer: "r\u00e9ussi", infinitive: "r\u00e9ussir", hint: "-ir \u2192 -i", en: "You passed the exam.", cat: "Regular -ir \u2192 -i" },
+      { type: "fill", sentence: "Ils ont ______ longtemps.", answer: "dormi", infinitive: "dormir", hint: "-ir \u2192 -i", en: "They slept a long time.", cat: "Regular -ir \u2192 -i" },
 
       // === REGULAR -RE → -U ===
-      { type: "fill", sentence: "Elle a ___ (vendre) sa maison.", answer: "vendu", hint: "-re → -u", en: "She sold her house.", cat: "Regular -re → -u" },
-      { type: "fill", sentence: "Nous avons ___ (répondre) à la lettre.", answer: "répondu", hint: "-re → -u", en: "We answered the letter.", cat: "Regular -re → -u" },
-      { type: "fill", sentence: "Vous avez ___ (entendre) le bruit?", answer: "entendu", hint: "-re → -u", en: "Did you hear the noise?", cat: "Regular -re → -u" },
-      { type: "fill", sentence: "J'ai ___ (attendre) le bus.", answer: "attendu", hint: "-re → -u", en: "I waited for the bus.", cat: "Regular -re → -u" },
-      { type: "fill", sentence: "Ils ont ___ (perdre) leurs clés.", answer: "perdu", hint: "-re → -u", en: "They lost their keys.", cat: "Regular -re → -u" },
-      { type: "fill", sentence: "Elle a ___ (défendre) son ami.", answer: "défendu", hint: "-re → -u", en: "She defended her friend.", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "Elle a ______ sa maison.", answer: "vendu", infinitive: "vendre", hint: "-re \u2192 -u", en: "She sold her house.", cat: "Regular -re \u2192 -u" },
+      { type: "fill", sentence: "Nous avons ______ \u00e0 la lettre.", answer: "r\u00e9pondu", infinitive: "r\u00e9pondre", hint: "-re \u2192 -u", en: "We answered the letter.", cat: "Regular -re \u2192 -u" },
+      { type: "fill", sentence: "Vous avez ______ le bruit?", answer: "entendu", infinitive: "entendre", hint: "-re \u2192 -u", en: "Did you hear the noise?", cat: "Regular -re \u2192 -u" },
+      { type: "fill", sentence: "J'ai ______ le bus.", answer: "attendu", infinitive: "attendre", hint: "-re \u2192 -u", en: "I waited for the bus.", cat: "Regular -re \u2192 -u" },
+      { type: "fill", sentence: "Ils ont ______ leurs cl\u00e9s.", answer: "perdu", infinitive: "perdre", hint: "-re \u2192 -u", en: "They lost their keys.", cat: "Regular -re \u2192 -u" },
+      { type: "fill", sentence: "Elle a ______ son ami.", answer: "d\u00e9fendu", infinitive: "d\u00e9fendre", hint: "-re \u2192 -u", en: "She defended her friend.", cat: "Regular -re \u2192 -u" },
     ];
 
     const CAT_COLORS = {
@@ -262,77 +262,99 @@
       }
 
       // FILL-IN-THE-BLANK CARD
+      const colors = CAT_COLORS[card.cat] || CAT_COLORS["\u00catre Verbs"];
+      const parts = card.sentence.split("______");
+      const fullSentence = card.sentence.replace("______", card.answer);
+
       return (
         <div
           onClick={onFlip}
           style={{
             background: "white",
-            borderRadius: 12,
-            padding: 24,
+            borderRadius: 16,
+            padding: 28,
             cursor: "pointer",
             minHeight: 320,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-            transition: "transform 0.2s, box-shadow 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-            e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.2)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.15)";
+            boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+            border: "2px solid #e2e8f0",
+            transition: "all 0.2s",
           }}
         >
-          {/* SENTENCE WITH BLANK */}
           <div>
-            <div style={{ fontSize: 16, color: "#1e293b", lineHeight: 1.8, fontWeight: 500, position: "relative" }}>
-              {card.sentence.split("___").map((part, i) => (
-                <React.Fragment key={i}>
-                  {part}
-                  {i < card.sentence.split("___").length - 1 && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        minWidth: isFlipped ? "auto" : 100,
-                        padding: "4px 8px",
-                        background: isFlipped ? "transparent" : "rgba(100, 116, 139, 0.1)",
-                        color: isFlipped ? "#1e293b" : "transparent",
-                        borderBottom: isFlipped ? "none" : "2px dashed #cbd5e1",
-                        fontWeight: 700,
-                        fontSize: isFlipped ? 15 : 15,
-                        marginRight: 2,
-                      }}
-                    >
-                      {isFlipped ? card.answer : ""}
-                    </span>
-                  )}
-                </React.Fragment>
-              ))}
+            {/* INFINITIVE — prominent at top */}
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <span
+                onClick={isFlipped ? undefined : (e) => { e.stopPropagation(); speak(card.infinitive, 0.75); }}
+                style={{
+                  fontSize: 28, fontWeight: 700, color: colors.text,
+                  cursor: "pointer", borderBottom: "2px dotted " + colors.border,
+                  paddingBottom: 2,
+                }}
+              >{card.infinitive}</span>
+              {card.agreement && (
+                <span style={{ fontSize: 13, color: "#94a3b8", marginLeft: 8 }}>({card.agreement})</span>
+              )}
             </div>
 
-            {/* HINT */}
-            {!isFlipped && (
-              <div style={{ fontSize: 12, color: "#cbd5e1", marginTop: 12, textAlign: "center", fontStyle: "italic" }}>
+            {/* SENTENCE WITH SINGLE BLANK */}
+            <div style={{ fontSize: 18, color: "#1e293b", lineHeight: 1.8, fontWeight: 500, textAlign: "center" }}>
+              {parts[0]}
+              <span
+                onClick={isFlipped ? (e) => { e.stopPropagation(); speak(card.answer, 0.75); } : undefined}
+                style={{
+                  display: "inline-block",
+                  minWidth: isFlipped ? "auto" : 120,
+                  padding: "4px 10px",
+                  margin: "0 4px",
+                  background: isFlipped ? colors.bg : "rgba(100, 116, 139, 0.06)",
+                  color: isFlipped ? colors.text : "transparent",
+                  borderBottom: isFlipped ? "2px dotted " + colors.border : "3px solid " + colors.border,
+                  borderRadius: isFlipped ? 6 : 0,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  cursor: isFlipped ? "pointer" : "default",
+                  transition: "all 0.3s",
+                }}
+              >
+                {isFlipped ? card.answer : "\u00a0"}
+              </span>
+              {parts[1]}
+            </div>
+
+            {/* HINT (for regular participle cards) */}
+            {!isFlipped && card.hint && (
+              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 14, textAlign: "center", fontStyle: "italic" }}>
                 {card.hint}
               </div>
             )}
 
-            {/* ENGLISH TRANSLATION (when revealed) */}
+            {/* PROMPT (when not flipped) */}
+            {!isFlipped && !card.hint && (
+              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 14, textAlign: "center" }}>
+                \u00eatre ou avoir? + participe pass\u00e9
+              </div>
+            )}
+
+            {/* ANSWER DETAILS (when flipped) */}
             {isFlipped && (
-              <div style={{ fontSize: 13, color: "#64748b", marginTop: 12, fontStyle: "italic", paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
-                {card.en}
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 14, color: "#64748b", fontStyle: "italic", textAlign: "center" }}>
+                  {card.en}
+                </div>
               </div>
             )}
           </div>
 
-          {/* SPEAKER & REVEAL TEXT */}
+          {/* SPEAKER FOR FULL SENTENCE */}
           <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 16, alignItems: "center" }}>
-            <SpeakerBtn text={card.sentence.replace("___", card.answer).replace("___", "")} />
+            {isFlipped && (
+              <SpeakerBtn text={fullSentence} label="Listen" />
+            )}
             {!isFlipped && (
-              <span style={{ fontSize: 12, color: "#94a3b8" }}>Click to reveal</span>
+              <span style={{ fontSize: 12, color: "#cbd5e1" }}>Tap to reveal</span>
             )}
           </div>
         </div>
