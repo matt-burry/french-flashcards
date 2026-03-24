@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Participes">
+<meta name="theme-color" content="#f8fafc">
+<title>Les Participes Passés Irréguliers — Irregular Past Participles</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback, useEffect } = React;
+
+// Irregular French past participles (~50 cards)
+const CARDS = [
+  // -u Participles (~12 cards)
+  { sentence: "J'ai ___ (avoir) beaucoup de chance.", answer: "eu", infinitive: "avoir", en: "I had a lot of luck.", cat: "-u Participles" },
+  { sentence: "Nous avons ___ (boire) du vin rouge hier soir.", answer: "bu", infinitive: "boire", en: "We drank red wine last night.", cat: "-u Participles" },
+  { sentence: "Il a ___ (connaître) ma grand-mère pendant longtemps.", answer: "connu", infinitive: "connaître", en: "He knew my grandmother for a long time.", cat: "-u Participles" },
+  { sentence: "Elle a ___ (courir) un marathon le mois dernier.", answer: "couru", infinitive: "courir", en: "She ran a marathon last month.", cat: "-u Participles" },
+  { sentence: "J'ai ___ (devoir) partir tôt ce matin.", answer: "dû", infinitive: "devoir", en: "I had to leave early this morning.", cat: "-u Participles" },
+  { sentence: "Tu as ___ (lire) ce livre intéressant ?", answer: "lu", infinitive: "lire", en: "Did you read that interesting book?", cat: "-u Participles" },
+  { sentence: "Il a ___ (pleuvoir) toute la journée samedi.", answer: "plu", infinitive: "pleuvoir", en: "It rained all day Saturday.", cat: "-u Participles" },
+  { sentence: "Je n'ai pas ___ (pouvoir) venir à la fête.", answer: "pu", infinitive: "pouvoir", en: "I couldn't come to the party.", cat: "-u Participles" },
+  { sentence: "Elle a ___ (recevoir) un cadeau magnifique pour son anniversaire.", answer: "reçu", infinitive: "recevoir", en: "She received a magnificent gift for her birthday.", cat: "-u Participles" },
+  { sentence: "Nous avons ___ (voir) un bon film au cinéma.", answer: "vu", infinitive: "voir", en: "We saw a good movie at the cinema.", cat: "-u Participles" },
+  { sentence: "Il a ___ (vouloir) essayer le nouveau restaurant en ville.", answer: "voulu", infinitive: "vouloir", en: "He wanted to try the new restaurant in town.", cat: "-u Participles" },
+  { sentence: "Elle a ___ (vivre) à Paris pendant dix ans.", answer: "vécu", infinitive: "vivre", en: "She lived in Paris for ten years.", cat: "-u Participles" },
+
+  // -is Participles (~6 cards)
+  { sentence: "J'ai ___ (mettre) la table avant le dîner.", answer: "mis", infinitive: "mettre", en: "I set the table before dinner.", cat: "-is Participles" },
+  { sentence: "Elle a ___ (prendre) le bus pour aller au travail.", answer: "pris", infinitive: "prendre", en: "She took the bus to go to work.", cat: "-is Participles" },
+  { sentence: "Nous avons ___ (apprendre) le français à l'école.", answer: "appris", infinitive: "apprendre", en: "We learned French at school.", cat: "-is Participles" },
+  { sentence: "Tu as ___ (comprendre) la question difficile ?", answer: "compris", infinitive: "comprendre", en: "Did you understand the difficult question?", cat: "-is Participles" },
+  { sentence: "Il s'est ___ (asseoir) sur le banc du jardin.", answer: "assis", infinitive: "asseoir", en: "He sat down on the garden bench.", cat: "-is Participles" },
+  { sentence: "On m'a ___ (permettre) d'entrer dans la salle.", answer: "permis", infinitive: "permettre", en: "I was allowed to enter the room.", cat: "-is Participles" },
+
+  // -it Participles (~5 cards)
+  { sentence: "Elle a ___ (écrire) une lettre à ses parents.", answer: "écrit", infinitive: "écrire", en: "She wrote a letter to her parents.", cat: "-it Participles" },
+  { sentence: "Il a ___ (dire) la vérité à tout le monde.", answer: "dit", infinitive: "dire", en: "He told the truth to everyone.", cat: "-it Participles" },
+  { sentence: "J'ai ___ (conduire) toute la nuit sans m'arrêter.", answer: "conduit", infinitive: "conduire", en: "I drove all night without stopping.", cat: "-it Participles" },
+  { sentence: "Cette région a ___ (produire) du vin excellent.", answer: "produit", infinitive: "produire", en: "This region produced excellent wine.", cat: "-it Participles" },
+  { sentence: "Ils ont ___ (construire) une maison nouvelle l'année dernière.", answer: "construit", infinitive: "construire", en: "They built a new house last year.", cat: "-it Participles" },
+
+  // -ait Participles (~3 cards)
+  { sentence: "Nous avons ___ (faire) un gâteau délicieux pour le dessert.", answer: "fait", infinitive: "faire", en: "We made a delicious cake for dessert.", cat: "-ait Participles" },
+  { sentence: "On a ___ (extraire) le minerai de la montagne.", answer: "extrait", infinitive: "extraire", en: "The ore was extracted from the mountain.", cat: "-ait Participles" },
+  { sentence: "Ce repas délicieux m'a ___ (satisfaire) complètement.", answer: "satisfait", infinitive: "satisfaire", en: "This delicious meal completely satisfied me.", cat: "-ait Participles" },
+
+  // -ert Participles (~5 cards)
+  { sentence: "J'ai ___ (ouvrir) la fenêtre pour prendre l'air frais.", answer: "ouvert", infinitive: "ouvrir", en: "I opened the window to get fresh air.", cat: "-ert Participles" },
+  { sentence: "Il m'a ___ (offrir) des fleurs pour mon anniversaire.", answer: "offert", infinitive: "offrir", en: "He gave me flowers for my birthday.", cat: "-ert Participles" },
+  { sentence: "La neige a ___ (couvrir) le jardin ce matin.", answer: "couvert", infinitive: "couvrir", en: "The snow covered the garden this morning.", cat: "-ert Participles" },
+  { sentence: "Nous avons ___ (découvrir) un restaurant merveilleux en vacances.", answer: "découvert", infinitive: "découvrir", en: "We discovered a wonderful restaurant on vacation.", cat: "-ert Participles" },
+  { sentence: "Il a ___ (souffrir) pendant très longtemps à cause de sa maladie.", answer: "souffert", infinitive: "souffrir", en: "He suffered for a very long time because of his illness.", cat: "-ert Participles" },
+
+  // Unique Participles (~8 cards)
+  { sentence: "Il a ___ (être) malade la semaine dernière.", answer: "été", infinitive: "être", en: "He was sick last week.", cat: "Unique Participles" },
+  { sentence: "Elle est ___ (naître) en France en 1985.", answer: "née", infinitive: "naître", en: "She was born in France in 1985.", cat: "Unique Participles" },
+  { sentence: "Le roi est ___ (mourir) en 1715.", answer: "mort", infinitive: "mourir", en: "The king died in 1715.", cat: "Unique Participles" },
+  { sentence: "Elle a ___ (peindre) un tableau magnifique pour l'exposition.", answer: "peint", infinitive: "peindre", en: "She painted a magnificent painting for the exhibition.", cat: "Unique Participles" },
+  { sentence: "J'ai ___ (craindre) le pire quand j'ai vu l'accident.", answer: "craint", infinitive: "craindre", en: "I feared the worst when I saw the accident.", cat: "Unique Participles" },
+  { sentence: "Il a ___ (joindre) les deux bouts avec difficulté cette année.", answer: "joint", infinitive: "joindre", en: "He made ends meet with difficulty this year.", cat: "Unique Participles" },
+  { sentence: "Nous avons ___ (suivre) le chemin indiqué par le guide.", answer: "suivi", infinitive: "suivre", en: "We followed the path indicated by the guide.", cat: "Unique Participles" },
+  { sentence: "Ils ont ___ (rire) toute la soirée pendant la fête.", answer: "ri", infinitive: "rire", en: "They laughed all evening during the party.", cat: "Unique Participles" },
+
+  // Additional cards to reach ~50-55
+  { sentence: "Elle a ___ (atteindre) son objectif après des années d'efforts.", answer: "atteint", infinitive: "atteindre", en: "She achieved her goal after years of effort.", cat: "-it Participles" },
+  { sentence: "Il a ___ (peint) la maison en blanc l'été dernier.", answer: "peint", infinitive: "peint", en: "He painted the house white last summer.", cat: "-it Participles" },
+  { sentence: "J'ai ___ (disparaître) mon téléphone ce matin.", answer: "disparu", infinitive: "disparaître", en: "My phone disappeared this morning.", cat: "-u Participles" },
+  { sentence: "Tu as ___ (admettre) que tu avais tort finalement.", answer: "admis", infinitive: "admettre", en: "You admitted that you were wrong in the end.", cat: "-is Participles" },
+  { sentence: "Elle a ___ (soumettre) son projet au professeur à temps.", answer: "soumis", infinitive: "soumettre", en: "She submitted her project to the professor on time.", cat: "-is Participles" },
+  { sentence: "Nous avons ___ (décider) d'aller au beach l'année prochaine.", answer: "décidé", infinitive: "décider", en: "We decided to go to the beach next year.", cat: "-u Participles" },
+  { sentence: "Il a ___ (naître) under une bonne étoile, c'est sûr.", answer: "né", infinitive: "naître", en: "He was born under a lucky star, for sure.", cat: "Unique Participles" },
+  { sentence: "Elle a ___ (inclure) tous les détails importants dans son rapport.", answer: "inclus", infinitive: "inclure", en: "She included all the important details in her report.", cat: "-is Participles" },
+  { sentence: "Nous avons ___ (conclure) que c'était impossible.", answer: "conclu", infinitive: "conclure", en: "We concluded that it was impossible.", cat: "-u Participles" },
+  { sentence: "Il a ___ (vaincre) ses peurs et a sauté du tremplin.", answer: "vaincu", infinitive: "vaincre", en: "He conquered his fears and jumped off the diving board.", cat: "-u Participles" },
+];
+
+const CATEGORIES = [...new Set(CARDS.map(c => c.cat))];
+
+const CAT_COLORS = {
+  "-u Participles":     { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
+  "-is Participles":    { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
+  "-it Participles":    { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
+  "-ait Participles":   { bg: "rgb(255, 237, 213)", border: "rgb(249, 115, 22)", text: "rgb(194, 65, 12)" },
+  "-ert Participles":   { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
+  "Unique Participles": { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+};
+
+// Text-to-speech helper — uses browser's built-in French voices
+function speak(text, rate = 0.9) {
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "fr-FR";
+  utter.rate = rate;
+  // Try to pick the best French voice available
+  const voices = window.speechSynthesis.getVoices();
+  const frVoice = voices.find(v => v.lang === "fr-FR" && v.name.includes("Thomas"))
+    || voices.find(v => v.lang === "fr-FR" && v.name.includes("Amélie"))
+    || voices.find(v => v.lang === "fr-FR" && !v.name.includes("Google"))
+    || voices.find(v => v.lang.startsWith("fr"));
+  if (frVoice) utter.voice = frVoice;
+  window.speechSynthesis.speak(utter);
+}
+
+// Speaker icon component
+function SpeakerBtn({ text, rate, size = 18, color = "#64748b" }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); speak(text, rate); }}
+      aria-label="Listen"
+      style={{
+        background: "none", border: "none", cursor: "pointer", padding: 4,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        borderRadius: 6, transition: "background 0.2s", verticalAlign: "middle",
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.06)"}
+      onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+    >
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      </svg>
+    </button>
+  );
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Preload voices (some browsers load them asynchronously)
+if (typeof window !== "undefined" && window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
+function FlashCards() {
+  const [activeCat, setActiveCat] = useState("All");
+  const [index, setIndex] = useState(0);
+  const [shuffledMode, setShuffledMode] = useState(false);
+  const [known, setKnown] = useState(new Set());
+  const [hideKnown, setHideKnown] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  const deck = useMemo(() => {
+    let cards = activeCat === "All" ? CARDS : CARDS.filter(c => c.cat === activeCat);
+    if (hideKnown) cards = cards.filter(c => !known.has(CARDS.indexOf(c)));
+    return shuffledMode ? shuffle(cards) : cards;
+  }, [activeCat, shuffledMode, hideKnown, known]);
+
+  const safeIndex = Math.min(index, Math.max(0, deck.length - 1));
+  const card = deck[safeIndex];
+  const globalIdx = card ? CARDS.indexOf(card) : -1;
+  const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["-u Participles"];
+
+  const resetCard = () => { setShowHint(false); setShowAnswer(false); };
+  const next = useCallback(() => { resetCard(); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
+  const prev = useCallback(() => { resetCard(); setIndex(i => Math.max(i - 1, 0)); }, []);
+  const toggleKnown = useCallback(() => {
+    if (globalIdx < 0) return;
+    setKnown(prev => {
+      const s = new Set(prev);
+      s.has(globalIdx) ? s.delete(globalIdx) : s.add(globalIdx);
+      return s;
+    });
+  }, [globalIdx]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === " ") { e.preventDefault(); setShowAnswer(a => !a); }
+      else if (e.key === "h" || e.key === "H") setShowHint(h => !h);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  const [touchStart, setTouchStart] = useState(null);
+  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 50) { diff > 0 ? prev() : next(); }
+    setTouchStart(null);
+  };
+
+  // Render the sentence with the blank highlighted
+  const renderSentence = () => {
+    if (!card) return null;
+    const parts = card.sentence.split("___");
+    return (
+      <div style={{ fontSize: 24, color: "#1e293b", lineHeight: 1.6, textAlign: "center", fontWeight: 500 }}>
+        {parts[0]}
+        <span
+          onClick={showAnswer ? (e) => { e.stopPropagation(); speak(card.answer, 0.75); } : undefined}
+          style={{
+            display: "inline-block", minWidth: showAnswer ? "auto" : 80,
+            borderBottom: showAnswer ? "none" : "3px solid " + colors.border,
+            padding: "2px 8px", margin: "0 4px",
+            background: showAnswer ? colors.bg : "transparent",
+            borderRadius: showAnswer ? 6 : 0,
+            color: showAnswer ? colors.text : "transparent",
+            fontWeight: 700, fontSize: 26,
+            transition: "all 0.3s",
+            cursor: showAnswer ? "pointer" : "default",
+            textDecoration: showAnswer ? "underline dotted" : "none",
+            textDecorationColor: showAnswer ? colors.border : "transparent",
+            textUnderlineOffset: 4,
+          }}
+          title={showAnswer ? "Click to hear pronunciation" : ""}
+        >
+          {showAnswer ? card.answer : "\u00a0"}
+        </span>
+        {parts[1]}
+      </div>
+    );
+  };
+
+  return (
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif", padding: "max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))", boxSizing: "border-box" }}
+    >
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ marginBottom: 20 }}>
+          <a href="index.html" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 13, color: "#64748b", textDecoration: "none", padding: "4px 0", marginBottom: 8 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#1e293b"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "#64748b"}
+          ><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>All decks</a>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0, textAlign: "center" }}>
+            Les Participes Passés Irréguliers
+          </h1>
+          <p style={{ color: "#64748b", fontSize: 14, marginTop: 4, textAlign: "center" }}>
+            {CARDS.length} cards — irregular past participles
+          </p>
+        </div>
+
+        {/* Category filter pills */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+          <button
+            onClick={() => { setActiveCat("All"); setIndex(0); resetCard(); }}
+            style={{
+              padding: "5px 12px", borderRadius: 20, border: "2px solid",
+              borderColor: activeCat === "All" ? "#475569" : "#cbd5e1",
+              background: activeCat === "All" ? "#475569" : "white",
+              color: activeCat === "All" ? "white" : "#475569",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >All ({CARDS.length})</button>
+          {CATEGORIES.map(cat => {
+            const c = CAT_COLORS[cat];
+            const count = CARDS.filter(x => x.cat === cat).length;
+            return (
+              <button key={cat}
+                onClick={() => { setActiveCat(cat); setIndex(0); resetCard(); }}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "2px solid",
+                  borderColor: activeCat === cat ? c.border : "#cbd5e1",
+                  background: activeCat === cat ? c.bg : "white",
+                  color: activeCat === cat ? c.text : "#64748b",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
+                }}
+              >{cat}</button>
+            );
+          })}
+        </div>
+
+        {/* Controls */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={shuffledMode} onChange={() => { setShuffledMode(!shuffledMode); setIndex(0); resetCard(); }} />
+            Shuffle
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#475569", cursor: "pointer" }}>
+            <input type="checkbox" checked={hideKnown} onChange={() => { setHideKnown(!hideKnown); setIndex(0); resetCard(); }} />
+            Hide known ({known.size})
+          </label>
+          {known.size > 0 && (
+            <button onClick={() => setKnown(new Set())}
+              style={{ fontSize: 12, color: "#ef4444", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+              Reset
+            </button>
+          )}
+        </div>
+
+        {deck.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 60, color: "#64748b" }}>
+            <p style={{ fontSize: 18 }}>You know all the cards in this category!</p>
+            <button onClick={() => { setHideKnown(false); }}
+              style={{ marginTop: 12, padding: "8px 20px", borderRadius: 8, border: "none", background: "#475569", color: "white", cursor: "pointer" }}>
+              Show all cards
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Progress */}
+            <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${((safeIndex + 1) / deck.length) * 100}%`, background: colors.border, borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+            <div style={{ textAlign: "center", marginBottom: 10, fontSize: 14, color: "#64748b" }}>
+              {safeIndex + 1} / {deck.length}
+              {card && <span style={{ marginLeft: 10, padding: "2px 8px", borderRadius: 12, background: colors.bg, color: colors.text, fontSize: 11, fontWeight: 600 }}>{card.cat}</span>}
+            </div>
+
+            {/* Main card */}
+            <div style={{
+              background: "white", borderRadius: 16, border: `3px solid ${colors.border}`,
+              padding: "36px 28px", marginBottom: 16,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+              minHeight: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              position: "relative",
+            }}>
+              {/* Hint watermark */}
+              {showHint && !showAnswer && (
+                <div style={{
+                  position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                  fontSize: 72, fontWeight: 800, color: colors.border, opacity: 0.12,
+                  pointerEvents: "none", whiteSpace: "nowrap", letterSpacing: 4,
+                  userSelect: "none",
+                }}>
+                  {card?.infinitive}
+                </div>
+              )}
+
+              {renderSentence()}
+
+              {/* Hint button */}
+              {!showAnswer && (
+                <button
+                  onClick={() => setShowHint(h => !h)}
+                  style={{
+                    marginTop: 20, padding: "8px 20px", borderRadius: 8,
+                    border: `2px solid ${showHint ? colors.border : "#e2e8f0"}`,
+                    background: showHint ? colors.bg : "#f8fafc",
+                    color: showHint ? colors.text : "#94a3b8",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                  }}
+                >
+                  {showHint ? `Hint: ${card?.infinitive}` : "Show hint (infinitive)"}
+                </button>
+              )}
+
+              {/* Answer section */}
+              {showAnswer && (
+                <div style={{ marginTop: 20, textAlign: "center", width: "100%" }}>
+                  {/* Listen to full sentence */}
+                  <div style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <SpeakerBtn text={card?.sentence.replace("___", card?.answer)} rate={0.85} size={20} color={colors.text} />
+                    <span style={{ fontSize: 13, color: "#94a3b8" }}>Listen to full sentence</span>
+                  </div>
+                  <div style={{
+                    padding: "12px 16px", background: colors.bg, borderRadius: 10,
+                    borderLeft: `4px solid ${colors.border}`,
+                  }}>
+                    <div style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>
+                      {card?.infinitive} → {card?.answer}
+                    </div>
+                    <div style={{ fontSize: 15, color: "#334155", fontStyle: "italic" }}>
+                      {card?.en}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reveal answer button */}
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <button
+                onClick={() => setShowAnswer(a => !a)}
+                style={{
+                  padding: "12px 32px", borderRadius: 10,
+                  border: "none",
+                  background: showAnswer ? "#e2e8f0" : colors.border,
+                  color: showAnswer ? "#475569" : "white",
+                  fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+                  boxShadow: showAnswer ? "none" : "0 4px 12px rgba(0,0,0,0.15)",
+                }}
+              >
+                {showAnswer ? "Hide answer" : "Reveal answer"}
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
+              <button onClick={prev} disabled={safeIndex === 0}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === 0 ? "#f1f5f9" : "white", color: safeIndex === 0 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === 0 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+              >←</button>
+              <div style={{ fontSize: 11, color: "#94a3b8", minWidth: 32, textAlign: "center" }}>{safeIndex + 1}</div>
+              <button onClick={next} disabled={safeIndex === deck.length - 1}
+                style={{
+                  width: 48, height: 48, borderRadius: "50%", border: "2px solid #cbd5e1",
+                  background: safeIndex === deck.length - 1 ? "#f1f5f9" : "white", color: safeIndex === deck.length - 1 ? "#cbd5e1" : "#475569",
+                  fontSize: 20, cursor: safeIndex === deck.length - 1 ? "default" : "pointer", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+              >→</button>
+            </div>
+
+            {/* Mark as known */}
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <button
+                onClick={toggleKnown}
+                style={{
+                  padding: "8px 20px", borderRadius: 8,
+                  border: known.has(globalIdx) ? "2px solid #10b981" : "2px solid #cbd5e1",
+                  background: known.has(globalIdx) ? "#d1fae5" : "#f8fafc",
+                  color: known.has(globalIdx) ? "#059669" : "#64748b",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
+                }}
+              >
+                {known.has(globalIdx) ? "✓ Known" : "Mark as known"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FlashCards />);
+</script>
+</body>
+</html>

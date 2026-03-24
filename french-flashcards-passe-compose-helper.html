@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Passé C." />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Le Passé Composé — Être ou Avoir</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; min-height: 100dvh; }
+    #app { padding: max(env(safe-area-inset-top, 16px), 16px) max(env(safe-area-inset-right, 16px), 16px) max(env(safe-area-inset-bottom, 16px), 16px) max(env(safe-area-inset-left, 16px), 16px); min-height: 100vh; }
+    .container { max-width: 720px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ============================================================================
+    // CARD DATA
+    // ============================================================================
+    const CARDS = [
+      // === ÊTRE OU AVOIR? (Rule/Concept Cards) ===
+      { type: "rule", front: "Quel verbe auxiliaire pour les verbes DR MRS VANDERTRAMP?", back: "être — Ces 17 verbes de mouvement/changement d'état utilisent toujours être au passé composé", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quels sont les 17 verbes DR MRS VANDERTRAMP?", back: "Devenir, Revenir, Monter, Rester, Sortir, Venir, Aller, Naître, Descendre, Entrer, Rentrer, Tomber, Retourner, Arriver, Mourir, Partir — Tous utilisent être", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quel verbe auxiliaire pour les verbes réfléchis?", back: "être — Tous les verbes réfléchis (se + verbe) utilisent être au passé composé", cat: "Être ou Avoir?" },
+      { type: "rule", front: "La plupart des verbes français utilisent quel auxiliaire?", back: "avoir — La grande majorité des verbes utilisent avoir au passé composé", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Les verbes monter, descendre, sortir, rentrer, passer peuvent-ils utiliser avoir?", back: "Oui! Avec un complément d'objet direct → avoir. Sans → être. 'Il est monté' (il a monté) vs 'Il a monté les valises' (avec objet)", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Accord du participe passé avec être?", back: "Le participe passé s'accorde avec le sujet. Elle est allée (f.s.), Ils sont partis (m.pl.), Elles sont revenues (f.pl.)", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Accord du participe passé avec avoir?", back: "Le participe passé s'accorde avec le COD (complément d'objet direct) s'il précède le verbe. 'Les films que j'ai regardés' mais 'J'ai regardé les films'", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quel est le participe passé d'un verbe -er?", back: "-er → -é. Exemple: parler → parlé, manger → mangé, regarder → regardé", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quel est le participe passé d'un verbe -ir?", back: "-ir → -i. Exemple: finir → fini, choisir → choisi, remplir → rempli", cat: "Être ou Avoir?" },
+      { type: "rule", front: "Quel est le participe passé d'un verbe -re?", back: "-re → -u. Exemple: vendre → vendu, répondre → répondu, attendre → attendu", cat: "Être ou Avoir?" },
+
+      // === ÊTRE VERBS (Fill-in-the-blank) ===
+      { type: "fill", sentence: "Elle ___ ___ à Paris hier.", answer: "est allée", hint: "aller (f.s.)", en: "She went to Paris yesterday.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Nous ___ ___ à huit heures.", answer: "sommes partis", hint: "partir (m.pl.)", en: "We left at eight o'clock.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Ils ___ ___ du train.", answer: "sont descendus", hint: "descendre (m.pl.)", en: "They got off the train.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Je ___ ___ médecin.", answer: "suis devenu", hint: "devenir (m.s.)", en: "I became a doctor.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Elles ___ ___ l'année dernière.", answer: "sont nées", hint: "naître (f.pl.)", en: "They were born last year.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Il ___ ___ à minuit.", answer: "est arrivé", hint: "arriver (m.s.)", en: "He arrived at midnight.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Elles ___ ___ tard ce soir.", answer: "sont rentrées", hint: "rentrer (f.pl.)", en: "They came back home late tonight.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Tu ___ ___ au premier étage.", answer: "es monté", hint: "monter (m.s.)", en: "You went up to the first floor.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Il ___ ___ pendant la guerre.", answer: "est mort", hint: "mourir (m.s.)", en: "He died during the war.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Elles ___ ___ au cinéma samedi.", answer: "sont allées", hint: "aller (f.pl.)", en: "They went to the cinema on Saturday.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Vous ___ ___ tôt le matin.", answer: "êtes venus", hint: "venir (pl.)", en: "You came early in the morning.", cat: "Être Verbs" },
+      { type: "fill", sentence: "Elle ___ ___ longtemps ici.", answer: "est restée", hint: "rester (f.s.)", en: "She stayed here for a long time.", cat: "Être Verbs" },
+
+      // === REFLEXIVE VERBS ===
+      { type: "fill", sentence: "Elle ___ ___ ___ tôt ce matin.", answer: "s'est levée", hint: "se lever (f.s.)", en: "She got up early this morning.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Nous ___ ___ ___ dans le parc.", answer: "nous sommes promenés", hint: "se promener (m.pl.)", en: "We took a walk in the park.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Ils ___ ___ ___ avant le dîner.", answer: "se sont lavés", hint: "se laver (m.pl.)", en: "They washed themselves before dinner.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Je ___ ___ ___ hier soir.", answer: "me suis couché", hint: "se coucher (m.s.)", en: "I went to bed last night.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Vous ___ ___ ___ à huit heures.", answer: "vous êtes réveillés", hint: "se réveiller (pl.)", en: "You woke up at eight o'clock.", cat: "Reflexive Verbs" },
+      { type: "fill", sentence: "Elle ___ ___ ___ avec son frère.", answer: "s'est disputée", hint: "se disputer (f.s.)", en: "She argued with her brother.", cat: "Reflexive Verbs" },
+
+      // === AVOIR VERBS ===
+      { type: "fill", sentence: "J'___ ___ un bon film.", answer: "ai regardé", hint: "regarder", en: "I watched a good movie.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Nous ___ ___ au restaurant.", answer: "avons mangé", hint: "manger", en: "We ate at the restaurant.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Elle ___ ___ ses amies hier.", answer: "a invité", hint: "inviter (f.)", en: "She invited her friends yesterday.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Ils ___ ___ beaucoup de plaisir.", answer: "ont eu", hint: "avoir", en: "They had a lot of pleasure.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Tu ___ ___ tes devoirs?", answer: "as fini", hint: "finir", en: "Did you finish your homework?", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Vous ___ ___ à la question.", answer: "avez répondu", hint: "répondre", en: "You answered the question.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "J'___ ___ le livre ce mois-ci.", answer: "ai lu", hint: "lire", en: "I read the book this month.", cat: "Avoir Verbs" },
+      { type: "fill", sentence: "Elle ___ ___ une belle robe.", answer: "a acheté", hint: "acheter", en: "She bought a beautiful dress.", cat: "Avoir Verbs" },
+
+      // === REGULAR -ER → -É ===
+      { type: "fill", sentence: "Elle a ___ (manger) une pomme.", answer: "mangé", hint: "-er → -é", en: "She ate an apple.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "Nous avons ___ (regarder) la télévision.", answer: "regardé", hint: "-er → -é", en: "We watched television.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "Ils ont ___ (jouer) au football.", answer: "joué", hint: "-er → -é", en: "They played football.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "J'ai ___ (parler) avec mon ami.", answer: "parlé", hint: "-er → -é", en: "I talked with my friend.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "Vous avez ___ (danser) toute la nuit.", answer: "dansé", hint: "-er → -é", en: "You danced all night.", cat: "Regular -er → -é" },
+      { type: "fill", sentence: "Elle a ___ (chanter) une chanson.", answer: "chanté", hint: "-er → -é", en: "She sang a song.", cat: "Regular -er → -é" },
+
+      // === REGULAR -IR → -I ===
+      { type: "fill", sentence: "J'ai ___ (finir) mes devoirs.", answer: "fini", hint: "-ir → -i", en: "I finished my homework.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "Ils ont ___ (choisir) un cadeau.", answer: "choisi", hint: "-ir → -i", en: "They chose a gift.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "Elle a ___ (remplir) le formulaire.", answer: "rempli", hint: "-ir → -i", en: "She filled out the form.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "Nous avons ___ (partir) à six heures.", answer: "parti", hint: "-ir → -i (though partir uses être)", en: "We left at six o'clock.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "Vous avez ___ (réussir) l'examen.", answer: "réussi", hint: "-ir → -i", en: "You passed the exam.", cat: "Regular -ir → -i" },
+      { type: "fill", sentence: "Ils ont ___ (dormir) longtemps.", answer: "dormi", hint: "-ir → -i", en: "They slept a long time.", cat: "Regular -ir → -i" },
+
+      // === REGULAR -RE → -U ===
+      { type: "fill", sentence: "Elle a ___ (vendre) sa maison.", answer: "vendu", hint: "-re → -u", en: "She sold her house.", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "Nous avons ___ (répondre) à la lettre.", answer: "répondu", hint: "-re → -u", en: "We answered the letter.", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "Vous avez ___ (entendre) le bruit?", answer: "entendu", hint: "-re → -u", en: "Did you hear the noise?", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "J'ai ___ (attendre) le bus.", answer: "attendu", hint: "-re → -u", en: "I waited for the bus.", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "Ils ont ___ (perdre) leurs clés.", answer: "perdu", hint: "-re → -u", en: "They lost their keys.", cat: "Regular -re → -u" },
+      { type: "fill", sentence: "Elle a ___ (défendre) son ami.", answer: "défendu", hint: "-re → -u", en: "She defended her friend.", cat: "Regular -re → -u" },
+    ];
+
+    const CAT_COLORS = {
+      "Être ou Avoir?":   { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
+      "Être Verbs":       { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
+      "Reflexive Verbs":  { bg: "rgb(252, 231, 243)", border: "rgb(236, 72, 153)", text: "rgb(190, 24, 93)" },
+      "Avoir Verbs":      { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
+      "Regular -er → -é": { bg: "rgb(220, 252, 231)", border: "rgb(34, 197, 94)", text: "rgb(21, 128, 61)" },
+      "Regular -ir → -i": { bg: "rgb(243, 232, 255)", border: "rgb(168, 85, 247)", text: "rgb(126, 34, 206)" },
+      "Regular -re → -u": { bg: "rgb(204, 251, 241)", border: "rgb(20, 184, 166)", text: "rgb(15, 118, 110)" },
+    };
+
+    // ============================================================================
+    // UTILITY FUNCTIONS
+    // ============================================================================
+    function shuffle(arr) {
+      let copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function speak(text, rate = 0.9) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "fr-FR";
+      utter.rate = rate;
+      const voices = window.speechSynthesis.getVoices();
+      const frVoice = voices.find(v => v.lang === "fr-FR" && v.name.includes("Thomas"))
+        || voices.find(v => v.lang === "fr-FR" && v.name.includes("Amélie"))
+        || voices.find(v => v.lang === "fr-FR" && !v.name.includes("Google"))
+        || voices.find(v => v.lang.startsWith("fr"));
+      if (frVoice) utter.voice = frVoice;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Preload voices
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    // ============================================================================
+    // SPEAKER BUTTON
+    // ============================================================================
+    function SpeakerBtn({ text, label = "", style = {} }) {
+      return (
+        <button
+          onClick={() => speak(text)}
+          title="Click to hear pronunciation"
+          style={{
+            background: "none",
+            border: "1px solid #cbd5e1",
+            borderRadius: 4,
+            padding: "4px 8px",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 12,
+            color: "#475569",
+            transition: "all 0.2s",
+            ...style,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#94a3b8";
+            e.currentTarget.style.color = "#1e293b";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#cbd5e1";
+            e.currentTarget.style.color = "#475569";
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a6 6 0 0 1 0 8.07"></path>
+          </svg>
+          {label}
+        </button>
+      );
+    }
+
+    // ============================================================================
+    // CARD COMPONENT
+    // ============================================================================
+    function Card({ card, isFlipped, onFlip }) {
+      if (card.type === "rule") {
+        return (
+          <div
+            onClick={onFlip}
+            style={{
+              perspective: "1000px",
+              cursor: "pointer",
+              height: 320,
+              minHeight: 320,
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                transition: "transform 0.5s",
+                transformStyle: "preserve-3d",
+                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              }}
+            >
+              {/* FRONT */}
+              <div
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  backfaceVisibility: "hidden",
+                  background: "white",
+                  borderRadius: 12,
+                  padding: 24,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  textAlign: "center",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 16, opacity: 0.5 }}>?</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: "#1e293b", lineHeight: 1.5 }}>
+                  {card.front}
+                </div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 16 }}>Click to reveal answer</div>
+              </div>
+
+              {/* BACK */}
+              <div
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  backfaceVisibility: "hidden",
+                  background: "white",
+                  borderRadius: 12,
+                  padding: 24,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  textAlign: "center",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                  transform: "rotateY(180deg)",
+                }}
+              >
+                <div style={{ fontSize: 16, color: "#1e293b", lineHeight: 1.6 }}>
+                  {card.back}
+                </div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 16 }}>
+                  <SpeakerBtn text={card.back} />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // FILL-IN-THE-BLANK CARD
+      return (
+        <div
+          onClick={onFlip}
+          style={{
+            background: "white",
+            borderRadius: 12,
+            padding: 24,
+            cursor: "pointer",
+            minHeight: 320,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-4px)";
+            e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.15)";
+          }}
+        >
+          {/* SENTENCE WITH BLANK */}
+          <div>
+            <div style={{ fontSize: 16, color: "#1e293b", lineHeight: 1.8, fontWeight: 500, position: "relative" }}>
+              {card.sentence.split("___").map((part, i) => (
+                <React.Fragment key={i}>
+                  {part}
+                  {i < card.sentence.split("___").length - 1 && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        minWidth: isFlipped ? "auto" : 100,
+                        padding: "4px 8px",
+                        background: isFlipped ? "transparent" : "rgba(100, 116, 139, 0.1)",
+                        color: isFlipped ? "#1e293b" : "transparent",
+                        borderBottom: isFlipped ? "none" : "2px dashed #cbd5e1",
+                        fontWeight: 700,
+                        fontSize: isFlipped ? 15 : 15,
+                        marginRight: 2,
+                      }}
+                    >
+                      {isFlipped ? card.answer : ""}
+                    </span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* HINT */}
+            {!isFlipped && (
+              <div style={{ fontSize: 12, color: "#cbd5e1", marginTop: 12, textAlign: "center", fontStyle: "italic" }}>
+                {card.hint}
+              </div>
+            )}
+
+            {/* ENGLISH TRANSLATION (when revealed) */}
+            {isFlipped && (
+              <div style={{ fontSize: 13, color: "#64748b", marginTop: 12, fontStyle: "italic", paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
+                {card.en}
+              </div>
+            )}
+          </div>
+
+          {/* SPEAKER & REVEAL TEXT */}
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 16, alignItems: "center" }}>
+            <SpeakerBtn text={card.sentence.replace("___", card.answer).replace("___", "")} />
+            {!isFlipped && (
+              <span style={{ fontSize: 12, color: "#94a3b8" }}>Click to reveal</span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ============================================================================
+    // MAIN APP
+    // ============================================================================
+    function App() {
+      const [cards, setCards] = useState(() => shuffle(CARDS));
+      const [currentIdx, setCurrentIdx] = useState(0);
+      const [flipped, setFlipped] = useState(false);
+      const [selectedCats, setSelectedCats] = useState(new Set(Object.keys(CAT_COLORS)));
+      const [hideKnown, setHideKnown] = useState(false);
+      const [knownCards, setKnownCards] = useState(new Set());
+      const [isShuffle, setIsShuffle] = useState(false);
+
+      const [touchStart, setTouchStart] = useState(null);
+      const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+      const handleTouchEnd = (e) => {
+        if (touchStart === null) return;
+        const diff = e.changedTouches[0].clientX - touchStart;
+        if (Math.abs(diff) > 50) { diff > 0 ? prevCard() : nextCard(); }
+        setTouchStart(null);
+      };
+
+      const filtered = cards.filter((c) => selectedCats.has(c.cat) && !(hideKnown && knownCards.has(c)));
+      const current = filtered[currentIdx] || null;
+      const progress = currentIdx + 1;
+      const total = filtered.length;
+
+      const toggleCategory = (cat) => {
+        setSelectedCats((prev) => {
+          const next = new Set(prev);
+          if (next.has(cat)) next.delete(cat);
+          else next.add(cat);
+          return next;
+        });
+        setCurrentIdx(0);
+        setFlipped(false);
+      };
+
+      const toggleKnown = () => {
+        if (current) {
+          setKnownCards((prev) => {
+            const next = new Set(prev);
+            if (next.has(current)) next.delete(current);
+            else next.add(current);
+            return next;
+          });
+        }
+      };
+
+      const nextCard = () => {
+        if (currentIdx < filtered.length - 1) {
+          setCurrentIdx(currentIdx + 1);
+          setFlipped(false);
+        }
+      };
+
+      const prevCard = () => {
+        if (currentIdx > 0) {
+          setCurrentIdx(currentIdx - 1);
+          setFlipped(false);
+        }
+      };
+
+      const shuffleCards = () => {
+        setCards(shuffle(cards));
+        setCurrentIdx(0);
+        setFlipped(false);
+      };
+
+      const toggleShuffle = () => {
+        if (!isShuffle) shuffleCards();
+        setIsShuffle(!isShuffle);
+      };
+
+      useEffect(() => {
+        const handleKey = (e) => {
+          if (e.key === " ") {
+            e.preventDefault();
+            setFlipped(!flipped);
+          } else if (e.key === "ArrowRight") nextCard();
+          else if (e.key === "ArrowLeft") prevCard();
+        };
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+      }, [flipped, currentIdx, filtered.length]);
+
+      if (!current) {
+        return (
+          <div className="container" style={{ color: "#1e293b", textAlign: "center", paddingTop: 100 }}>
+            <h2>No cards match your filters</h2>
+            <p>Try selecting other categories</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="container">
+          {/* BACK TO INDEX LINK */}
+          <div style={{ marginBottom: 20 }}>
+            <a href="index.html" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 13, color: "#64748b", textDecoration: "none", padding: "4px 0", marginBottom: 8 }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#1e293b"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "#64748b"}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+              All decks
+            </a>
+          </div>
+
+          {/* HEADER */}
+          <div style={{ marginBottom: 24 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", margin: 0, textAlign: "center" }}>
+              Le Passé Composé
+            </h1>
+            <p style={{ color: "#64748b", fontSize: 14, marginTop: 4, textAlign: "center" }}>
+              {CARDS.length} cards — être vs avoir &amp; regular participle formation
+            </p>
+          </div>
+
+          {/* CATEGORY PILLS */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 24 }}>
+            {Object.keys(CAT_COLORS).map((cat) => {
+              const color = CAT_COLORS[cat];
+              const isSelected = selectedCats.has(cat);
+              return (
+                <button
+                  key={cat}
+                  onClick={() => toggleCategory(cat)}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: 20,
+                    border: `2px solid ${color.border}`,
+                    background: isSelected ? color.bg : "white",
+                    color: isSelected ? color.text : "#64748b",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = "#f1f5f9";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isSelected ? color.bg : "white";
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* CARD PROGRESS */}
+          <div style={{ textAlign: "center", marginBottom: 20, color: "#64748b", fontSize: 13 }}>
+            Card {progress} of {total}
+          </div>
+
+          {/* CARD */}
+          <div style={{ marginBottom: 28 }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+            {current && <Card card={current} isFlipped={flipped} onFlip={() => setFlipped(!flipped)} />}
+          </div>
+
+          {/* NAVIGATION */}
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 20, marginBottom: 16 }}>
+            <button onClick={prevCard} disabled={currentIdx === 0}
+              style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #cbd5e1", background: "white", color: currentIdx === 0 ? "#cbd5e1" : "#475569", cursor: currentIdx === 0 ? "default" : "pointer", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>
+              ‹
+            </button>
+            <button onClick={() => setFlipped(!flipped)}
+              style={{ padding: "8px 20px", borderRadius: 20, border: "2px solid #3b82f6", background: "#eff6ff", color: "#2563eb", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "all 0.2s" }}>
+              {flipped ? "Show Question" : "Reveal"} (Space)
+            </button>
+            <button onClick={nextCard} disabled={currentIdx >= filtered.length - 1}
+              style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #cbd5e1", background: "white", color: currentIdx >= filtered.length - 1 ? "#cbd5e1" : "#475569", cursor: currentIdx >= filtered.length - 1 ? "default" : "pointer", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>
+              ›
+            </button>
+          </div>
+
+          {/* SECONDARY CONTROLS */}
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 40, flexWrap: "wrap" }}>
+            <button onClick={toggleShuffle}
+              style={{ padding: "6px 12px", borderRadius: 20, border: "2px solid", borderColor: isShuffle ? "#3b82f6" : "#cbd5e1", background: isShuffle ? "#eff6ff" : "white", color: isShuffle ? "#2563eb" : "#64748b", cursor: "pointer", fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
+              {isShuffle ? "Shuffled" : "Shuffle"}
+            </button>
+            <button onClick={toggleKnown}
+              style={{ padding: "6px 12px", borderRadius: 20, border: "2px solid", borderColor: knownCards.has(current) ? "#22c55e" : "#cbd5e1", background: knownCards.has(current) ? "#dcfce7" : "white", color: knownCards.has(current) ? "#15803d" : "#64748b", cursor: "pointer", fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
+              {knownCards.has(current) ? "✓ Known" : "Mark Known"}
+            </button>
+            <button onClick={() => setHideKnown(!hideKnown)}
+              style={{ padding: "6px 12px", borderRadius: 20, border: "2px solid", borderColor: hideKnown ? "#f59e0b" : "#cbd5e1", background: hideKnown ? "#fef3c7" : "white", color: hideKnown ? "#b45309" : "#64748b", cursor: "pointer", fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>
+              {hideKnown ? "Showing Unknown" : "Hide Known"}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ============================================================================
+    // RENDER
+    // ============================================================================
+    ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+  </script>
+</body>
+</html>
