@@ -158,7 +158,6 @@ function FlashCards() {
   const [shuffledMode, setShuffledMode] = useState(false);
   const [known, setKnown] = useState(new Set());
   const [hideKnown, setHideKnown] = useState(false);
-  const [showHint, setShowHint] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
 
   const deck = useMemo(() => {
@@ -172,7 +171,7 @@ function FlashCards() {
   const globalIdx = card ? CARDS.indexOf(card) : -1;
   const colors = card ? CAT_COLORS[card.cat] : CAT_COLORS["-u Participles"];
 
-  const resetCard = () => { setShowHint(false); setShowAnswer(false); };
+  const resetCard = () => { setShowAnswer(false); };
   const next = useCallback(() => { resetCard(); setIndex(i => Math.min(i + 1, deck.length - 1)); }, [deck.length]);
   const prev = useCallback(() => { resetCard(); setIndex(i => Math.max(i - 1, 0)); }, []);
   const toggleKnown = useCallback(() => {
@@ -189,7 +188,6 @@ function FlashCards() {
       if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
       else if (e.key === " ") { e.preventDefault(); setShowAnswer(a => !a); }
-      else if (e.key === "h" || e.key === "H") setShowHint(h => !h);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -331,42 +329,14 @@ function FlashCards() {
               minHeight: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               position: "relative",
             }}>
-              {/* Hint watermark */}
-              {showHint && !showAnswer && (
-                <div style={{
-                  position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
-                  fontSize: 72, fontWeight: 800, color: colors.border, opacity: 0.12,
-                  pointerEvents: "none", whiteSpace: "nowrap", letterSpacing: 4,
-                  userSelect: "none",
-                }}>
-                  {card?.infinitive}
-                </div>
-              )}
-
               {renderSentence()}
-
-              {/* Hint button */}
-              {!showAnswer && (
-                <button
-                  onClick={() => setShowHint(h => !h)}
-                  style={{
-                    marginTop: 20, padding: "8px 20px", borderRadius: 8,
-                    border: `2px solid ${showHint ? colors.border : "#e2e8f0"}`,
-                    background: showHint ? colors.bg : "#f8fafc",
-                    color: showHint ? colors.text : "#94a3b8",
-                    fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s",
-                  }}
-                >
-                  {showHint ? `Hint: ${card?.infinitive}` : "Show hint (infinitive)"}
-                </button>
-              )}
 
               {/* Answer section */}
               {showAnswer && (
                 <div style={{ marginTop: 20, textAlign: "center", width: "100%" }}>
                   {/* Listen to full sentence */}
                   <div style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <SpeakerBtn text={card?.sentence.replace("___", card?.answer)} rate={0.85} size={20} color={colors.text} />
+                    <SpeakerBtn text={card?.sentence.replace("___", card?.answer).replace(/\s*\([^)]*\)\s*/g, " ").trim()} rate={0.85} size={20} color={colors.text} />
                     <span style={{ fontSize: 13, color: "#94a3b8" }}>Listen to full sentence</span>
                   </div>
                   <div style={{

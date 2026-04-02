@@ -29,18 +29,6 @@
     // CARD DATA
     // ============================================================================
     const CARDS = [
-      // === ÊTRE OU AVOIR? (Rule/Concept Cards) ===
-      { type: "rule", front: "Quel verbe auxiliaire pour les verbes DR MRS VANDERTRAMP?", back: "\u00eatre \u2014 Ces 17 verbes de mouvement/changement d'\u00e9tat utilisent toujours \u00eatre au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Quels sont les 17 verbes DR MRS VANDERTRAMP?", back: "Devenir, Revenir, Monter, Rester, Sortir, Venir, Aller, Na\u00eetre, Descendre, Entrer, Rentrer, Tomber, Retourner, Arriver, Mourir, Partir \u2014 Tous utilisent \u00eatre", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Quel verbe auxiliaire pour les verbes r\u00e9fl\u00e9chis?", back: "\u00eatre \u2014 Tous les verbes r\u00e9fl\u00e9chis (se + verbe) utilisent \u00eatre au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "La plupart des verbes fran\u00e7ais utilisent quel auxiliaire?", back: "avoir \u2014 La grande majorit\u00e9 des verbes utilisent avoir au pass\u00e9 compos\u00e9", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Les verbes monter, descendre, sortir, rentrer, passer peuvent-ils utiliser avoir?", back: "Oui! Avec un compl\u00e9ment d'objet direct \u2192 avoir. Sans \u2192 \u00eatre. 'Il est mont\u00e9' vs 'Il a mont\u00e9 les valises' (avec objet)", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Accord du participe pass\u00e9 avec \u00eatre?", back: "Le participe pass\u00e9 s'accorde avec le sujet. Elle est all\u00e9e (f.s.), Ils sont partis (m.pl.), Elles sont revenues (f.pl.)", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Accord du participe pass\u00e9 avec avoir?", back: "Le participe pass\u00e9 s'accorde avec le COD s'il pr\u00e9c\u00e8de le verbe. 'Les films que j'ai regard\u00e9s' mais 'J'ai regard\u00e9 les films'", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -er?", back: "-er \u2192 -\u00e9. Exemple: parler \u2192 parl\u00e9, manger \u2192 mang\u00e9, regarder \u2192 regard\u00e9", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -ir?", back: "-ir \u2192 -i. Exemple: finir \u2192 fini, choisir \u2192 choisi, remplir \u2192 rempli", cat: "\u00catre ou Avoir?" },
-      { type: "rule", front: "Quel est le participe pass\u00e9 d'un verbe -re?", back: "-re \u2192 -u. Exemple: vendre \u2192 vendu, r\u00e9pondre \u2192 r\u00e9pondu, attendre \u2192 attendu", cat: "\u00catre ou Avoir?" },
-
       // === ÊTRE VERBS (Fill-in-the-blank) ===
       { type: "fill", sentence: "Elle ______ \u00e0 Paris hier.", answer: "est all\u00e9e", infinitive: "aller", agreement: "f.s.", en: "She went to Paris yesterday.", cat: "\u00catre Verbs" },
       { type: "fill", sentence: "Nous ______ \u00e0 huit heures.", answer: "sommes partis", infinitive: "partir", agreement: "m.pl.", en: "We left at eight o'clock.", cat: "\u00catre Verbs" },
@@ -99,7 +87,6 @@
     ];
 
     const CAT_COLORS = {
-      "Être ou Avoir?":   { bg: "rgb(254, 243, 199)", border: "rgb(245, 158, 11)", text: "rgb(180, 83, 9)" },
       "Être Verbs":       { bg: "rgb(254, 226, 226)", border: "rgb(239, 68, 68)", text: "rgb(185, 28, 28)" },
       "Reflexive Verbs":  { bg: "rgb(252, 231, 243)", border: "rgb(236, 72, 153)", text: "rgb(190, 24, 93)" },
       "Avoir Verbs":      { bg: "rgb(219, 234, 254)", border: "rgb(59, 130, 246)", text: "rgb(29, 78, 216)" },
@@ -184,83 +171,6 @@
     // CARD COMPONENT
     // ============================================================================
     function Card({ card, isFlipped, onFlip }) {
-      if (card.type === "rule") {
-        return (
-          <div
-            onClick={onFlip}
-            style={{
-              perspective: "1000px",
-              cursor: "pointer",
-              height: 320,
-              minHeight: 320,
-            }}
-          >
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                transition: "transform 0.5s",
-                transformStyle: "preserve-3d",
-                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-              }}
-            >
-              {/* FRONT */}
-              <div
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  backfaceVisibility: "hidden",
-                  background: "white",
-                  borderRadius: 12,
-                  padding: 24,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                }}
-              >
-                <div style={{ fontSize: 32, marginBottom: 16, opacity: 0.5 }}>?</div>
-                <div style={{ fontSize: 18, fontWeight: 600, color: "#1e293b", lineHeight: 1.5 }}>
-                  {card.front}
-                </div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 16 }}>Click to reveal answer</div>
-              </div>
-
-              {/* BACK */}
-              <div
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  backfaceVisibility: "hidden",
-                  background: "white",
-                  borderRadius: 12,
-                  padding: 24,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                  transform: "rotateY(180deg)",
-                }}
-              >
-                <div style={{ fontSize: 16, color: "#1e293b", lineHeight: 1.6 }}>
-                  {card.back}
-                </div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 16 }}>
-                  <SpeakerBtn text={card.back} />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
-
       // FILL-IN-THE-BLANK CARD
       const colors = CAT_COLORS[card.cat] || CAT_COLORS["\u00catre Verbs"];
       const parts = card.sentence.split("______");
@@ -334,7 +244,7 @@
             {/* PROMPT (when not flipped) */}
             {!isFlipped && !card.hint && (
               <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 14, textAlign: "center" }}>
-                \u00eatre ou avoir? + participe pass\u00e9
+                être ou avoir? + participe passé
               </div>
             )}
 
